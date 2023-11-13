@@ -19,3 +19,148 @@ jobs:
       - name: Create branch if not found 🏗️
         run: |
           git checkout -f update || git switch --discard-changes --orphan update
+
+      - name: Get Magisk Stable Version ✅
+        shell: python
+        run: |
+          import requests
+          from bs4 import BeautifulSoup
+          import re
+          import os
+          import json
+          import time
+          env_file = os.getenv('GITHUB_ENV')      
+          print("Check Magisk Stable Version")
+          magiskstablemsg = ""
+          currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskstable.appversion").text
+          latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/stable.json").content)['magisk']['version']
+          latestver = latestver.replace('\n', '')
+          currentver = currentver.replace('\n', '')
+          if currentver != latestver:
+              build = False
+              magiskstablemsg = "Update Magisk Stable Version from `v" + currentver + "` to `v" + latestver + "`"
+          else:
+              magiskstablemsg = "Magisk Stable Version: `" + latestver + "`"    
+          file = open('magiskstable.appversion', 'w')
+          file.write(latestver)
+          file.close()
+          with open(env_file, 'a') as file:
+            file.write(f"MAGISK_STABLE_MSG={magiskstablemsg}\n")
+          print (magiskstablemsg)  
+
+
+      - name: Get Magisk Canary Version ✅
+        shell: python
+        run: |
+          import requests
+          from bs4 import BeautifulSoup
+          import re
+          import os
+          import json
+          import time
+          env_file = os.getenv('GITHUB_ENV')      
+          print("Check Magisk Canary Version")
+          currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskcanary.appversion").text
+          latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/canary.json").content)['magisk']['version']
+          latestver = latestver.replace('\n', '')
+          currentver = currentver.replace('\n', '')
+          if currentver != latestver:
+              build = False
+              magiskcanarymsg = "Update Magisk Canary Version from `v" + currentver + "` to `v" + latestver + "`"
+          else:
+            magiskcanarymsg = "Magisk Canary Version: `" + latestver + "`"  
+          file = open('magiskcanary.appversion', 'w')
+          file.write(latestver)
+          file.close()
+          with open(env_file, 'a') as file:
+            file.write(f"MAGISK_CANARY_MSG={magiskcanarymsg}\n")    
+          print (magiskcanarymsg)
+
+      - name: Get KernelSU Version ✅
+        shell: python
+        run: |
+            import requests
+            from bs4 import BeautifulSoup
+            import re
+            import os
+            import json
+            import time
+            env_file = os.getenv('GITHUB_ENV')
+            print("Check KernelSU Version")
+            kernelsumsg = ""
+            latestver = json.loads(requests.get(f"https://api.github.com/repos/tiann/kernelsu/releases/latest").content)['tag_name']
+            latestver = latestver.replace('v', '')
+            latestver = latestver.replace('\n', '')
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/kernelsu.appversion").text
+            currentver = currentver.replace('\n', '')
+            if currentver != latestver:
+                build = False
+                kernelsumsg = "Update KernelSU Version from `v" + currentver + "` to `v" + latestver + "`"
+            else:
+                kernelsumsg = "KernelSU Version: `" + latestver + "`"
+            file = open('kernelsu.appversion', 'w')
+            file.write(latestver)
+            file.close()
+            with open(env_file, 'a') as file:
+              file.write(f"KERNEL_SU_MSG={kernelsumsg}\n") 
+            print (kernelsumsg)     
+
+      - name: Get MindTheGapps Version ✅
+        shell: python
+        run: |
+            import requests
+            from bs4 import BeautifulSoup
+            import re
+            import os
+            import json
+            import time
+            env_file = os.getenv('GITHUB_ENV')
+            print("Check MindTheGapps Version")
+            mtgmsg = ""
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/gapps.appversion").text
+            latestver = json.loads(requests.get(f"https://api.github.com/repos/YT-Advanced/MindTheGappsBuilder/releases/latest").content)['name']
+            latestver = latestver.replace('\n', '')
+            currentver = currentver.replace('\n', '')
+            if currentver != latestver:
+                build = False
+                mtgmsg = "Update MindTheGapps Version from `v" + currentver + "` to `v" + latestver + "`"
+            else:
+                mtgmsg = "MindTheGapps Package Version: `" + latestver + "`"
+            file = open('gapps.appversion', 'w')
+            file.write(latestver)
+            file.close()
+            with open(env_file, 'a') as file:
+              file.write(f"MTG_MSG={mtgmsg}\n")  
+            print (mtgmsg)                  
+
+      - name: Update App version 🔗
+        uses: stefanzweifel/git-auto-commit-action@v5.0.0
+        with:
+          branch: update
+          push_options: '--force'
+          file_pattern: '*.appversion'
+          commit_message: ${{ env.MSG || 'Update App Version' }}
+          create_branch: true
+          
+      - name: Delete old workflow run ❌
+        uses: Mattraks/delete-workflow-runs@v2.0.5
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
+          delete_workflow_pattern: "Check update"
+          
+      - name: Checkout Again! 🔄
+        uses: actions/checkout@v4.1.1
+        
+    outputs:
+      SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
+      INSIDER_BUILD: ${{ env.INSIDER }}
+      WSA_UPDATE_MESSAGE: ${{ env.MSG }}
+      MAGISK_CANARY_MSG: ${{ env.MAGISK_CANARY_MSG }}
+      MAGISK_STABLE_MSG: ${{ env.MAGISK_STABLE_MSG }}
+      KERNEL_SU_MSG: ${{ env.KERNEL_SU_MSG }}
+      WIF_VER: ${{ env.LATEST_WIF_VER }}
+      RETAIL_VER: ${{ env.LATEST_RETAIL_VER }}
+      MTG_MSG: ${{ env.MTG_MSG }}
