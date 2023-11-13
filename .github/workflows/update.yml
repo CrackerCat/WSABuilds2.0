@@ -23,116 +23,128 @@ jobs:
       - name: Get Magisk Stable Version ✅
         shell: python
         run: |
-          import requests
-          from bs4 import BeautifulSoup
-          import re
-          import os
-          import json
-          import time
-          env_file = os.getenv('GITHUB_ENV')      
-          print("Check Magisk Stable Version")
-          magiskstablemsg = ""
-          currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskstable.appversion").text
-          latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/stable.json").content)['magisk']['version']
-          latestver = latestver.replace('\n', '')
-          currentver = currentver.replace('\n', '')
-          if currentver != latestver:
-              build = False
-              magiskstablemsg = "Update Magisk Stable Version from `v" + currentver + "` to `v" + latestver + "`"
-          else:
-              magiskstablemsg = "Magisk Stable Version: `" + latestver + "`"    
-          file = open('magiskstable.appversion', 'w')
-          file.write(latestver)
-          file.close()
-          with open(env_file, 'a') as file:
-            file.write(f"MAGISK_STABLE_MSG={magiskstablemsg}\n")
-          print (magiskstablemsg)  
-
+            import os
+            import json
+            import requests
+            import logging
+            import subprocess
+            logging.captureWarnings(True)
+            env_file = os.getenv('GITHUB_ENV')
+            new_version_found = False
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskstable.appversion").text.replace('\n', '')
+            with open('../magiskstable.appversion', 'w') as file:
+                file.write(currentver)
+            if not new_version_found:
+                # Get latest version
+                latestver = ""
+                magiskstablemsg = ""
+                latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/stable.json").content)['magisk']['version'].replace('\n', '')
+                magiskstablemsg="Update Magisk Stable Version from `v" + currentver + "` to `v" + latestver + "`"
+                if currentver != latestver:
+                    print("New version found: " + latestver)
+                    new_version_found = True
+                    # Write appversion content
+                    with open('magiskstable.appversion', 'w+') as file:
+                        file.seek(0)
+                        file.truncate()
+                        file.write(latestver)
+                    # Write Github Environment
+                    with open(env_file, "a") as wr:
+                        wr.write(f"MAGISK_STABLE_MSG={magiskstablemsg}\n")
+                file.close()      
 
       - name: Get Magisk Canary Version ✅
         shell: python
         run: |
-          import requests
-          from bs4 import BeautifulSoup
-          import re
-          import os
-          import json
-          import time
-          env_file = os.getenv('GITHUB_ENV')      
-          print("Check Magisk Canary Version")
-          currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskcanary.appversion").text
-          latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/canary.json").content)['magisk']['version']
-          latestver = latestver.replace('\n', '')
-          currentver = currentver.replace('\n', '')
-          if currentver != latestver:
-              build = False
-              magiskcanarymsg = "Update Magisk Canary Version from `v" + currentver + "` to `v" + latestver + "`"
-          else:
-            magiskcanarymsg = "Magisk Canary Version: `" + latestver + "`"  
-          file = open('magiskcanary.appversion', 'w')
-          file.write(latestver)
-          file.close()
-          with open(env_file, 'a') as file:
-            file.write(f"MAGISK_CANARY_MSG={magiskcanarymsg}\n")    
-          print (magiskcanarymsg)
+            import requests
+            from bs4 import BeautifulSoup
+            import re
+            import os
+            import json
+            import time
+            env_file = os.getenv('GITHUB_ENV')      
+            print("Check Magisk Canary Version")
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskcanary.appversion").text
+            latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/canary.json").content)['magisk']['version']
+            latestver = latestver.replace('\n', '')
+            currentver = currentver.replace('\n', '')
+            if currentver != latestver:
+                build = False
+                magiskcanarymsg = "Update Magisk Canary Version from `v" + currentver + "` to `v" + latestver + "`"
+            else:
+              magiskcanarymsg = "Magisk Canary Version: `" + latestver + "`"  
+            file = open('magiskcanary.appversion', 'w')
+            file.write(latestver)
+            file.close()
+            with open(env_file, 'a') as file:
+              file.write(f"MAGISK_CANARY_MSG={magiskcanarymsg}\n")    
+            print (magiskcanarymsg)
 
       - name: Get KernelSU Version ✅
         shell: python
         run: |
-            import requests
-            from bs4 import BeautifulSoup
-            import re
             import os
             import json
-            import time
+            import requests
+            import logging
+            import subprocess
+            logging.captureWarnings(True)
             env_file = os.getenv('GITHUB_ENV')
-            print("Check KernelSU Version")
-            kernelsumsg = ""
-            latestver = json.loads(requests.get(f"https://api.github.com/repos/tiann/kernelsu/releases/latest").content)['tag_name']
-            latestver = latestver.replace('v', '')
-            latestver = latestver.replace('\n', '')
-            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/kernelsu.appversion").text
-            currentver = currentver.replace('\n', '')
-            if currentver != latestver:
-                build = False
-                kernelsumsg = "Update KernelSU Version from `v" + currentver + "` to `v" + latestver + "`"
-            else:
-                kernelsumsg = "KernelSU Version: `" + latestver + "`"
-            file = open('kernelsu.appversion', 'w')
-            file.write(latestver)
-            file.close()
-            with open(env_file, 'a') as file:
-              file.write(f"KERNEL_SU_MSG={kernelsumsg}\n") 
-            print (kernelsumsg)     
+            new_version_found = False
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/kernelsu.appversion").text.replace('\n', '')
+            with open('../kernelsu.appversion', 'w') as file:
+                file.write(currentver)
+            if not new_version_found:
+                # Get latest version
+                latestver = ""
+                kernelsumsg = ""
+                latestver = json.loads(requests.get(f"https://api.github.com/repos/tiann/kernelsu/releases/latest").content)['tag_name'].replace('v', '').replace('\n', '')
+                kernelsumsg="Update KernelSU Version from `v" + currentver + "` to `v" + latestver + "`"
+                if currentver != latestver:
+                    print("New version found: " + latestver)
+                    new_version_found = True
+                    # Write appversion content
+                    subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
+                    with open('kernelsumsg.appversion', 'w+') as file:
+                        file.seek(0)
+                        file.truncate()
+                        file.write(latestver)
+                    # Write Github Environment
+                    with open(env_file, "a") as wr:
+                        wr.write(f"KERNEL_SU_MSG={kernelsumsg}\n")
+                file.close()            
 
       - name: Get MindTheGapps Version ✅
         shell: python
         run: |
-            import requests
-            from bs4 import BeautifulSoup
-            import re
             import os
             import json
-            import time
+            import requests
+            import logging
+            import subprocess
+            logging.captureWarnings(True)
             env_file = os.getenv('GITHUB_ENV')
-            print("Check MindTheGapps Version")
-            mtgmsg = ""
-            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/gapps.appversion").text
-            latestver = json.loads(requests.get(f"https://api.github.com/repos/YT-Advanced/MindTheGappsBuilder/releases/latest").content)['name']
-            latestver = latestver.replace('\n', '')
-            currentver = currentver.replace('\n', '')
-            if currentver != latestver:
-                build = False
-                mtgmsg = "Update MindTheGapps Version from `v" + currentver + "` to `v" + latestver + "`"
-            else:
-                mtgmsg = "MindTheGapps Package Version: `" + latestver + "`"
-            file = open('gapps.appversion', 'w')
-            file.write(latestver)
-            file.close()
-            with open(env_file, 'a') as file:
-              file.write(f"MTG_MSG={mtgmsg}\n")  
-            print (mtgmsg)                  
-
+            new_version_found = False
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/gapps.appversion").text.replace('\n', '')
+            with open('../gapps.appversion', 'w') as file:
+                file.write(currentver)
+            if not new_version_found:
+                latestver = ""
+                mtgmsg = ""
+                latestver = json.loads(requests.get(f"https://api.github.com/repos/YT-Advanced/MindTheGappsBuilder/releases/latest").content)['name'].replace('\n', '')
+                mtgmsg="Update MindTheGapps Version from `v" + currentver + "` to `v" + latestver + "`"
+                if currentver != latestver:
+                    print("New version found: " + latestver)
+                    new_version_found = True
+                    subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
+                    with open('gapps.appversion', 'w+') as file:
+                        file.seek(0)
+                        file.truncate()
+                        file.write(latestver)
+                    with open(env_file, "a") as wr:
+                        wr.write(f"MTG_MSG={mtgmsg}\n")
+                file.close()        
+                
       - name: Update App version 🔗
         uses: stefanzweifel/git-auto-commit-action@v5.0.0
         with:
