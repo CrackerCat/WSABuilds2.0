@@ -15,13 +15,9 @@ jobs:
       - name: Install Dependencies 🧑‍🏭
         run: |
           pip3 install beautifulsoup4 lxml
-
-      - name: Check File Directories
-        run: |
-          ls
  
       - name: Get app version ✅
-        working-directory: 'Update Check'
+        working-directory: 'MagiskOnWSA/Update Check'
         run: python3 MagiskStableUpdateCheck.py
         
                 
