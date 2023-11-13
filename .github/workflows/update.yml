@@ -22,6 +22,7 @@ jobs:
             if [ $? -ne 0 ]; then
                 echo "Branch does not exist, creating..."
                 git switch --discard-changes --orphan update
+                git commit --allow-empty -m "Initial commit"
             else
                 echo "Branch exists, not creating."
             fi
