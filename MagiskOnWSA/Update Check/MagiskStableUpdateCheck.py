@@ -10,7 +10,7 @@ git = (
     "git checkout -f update || git switch --discard-changes --orphan update"
 )
 currentver = requests.get(f"https://raw.githubusercontent.com/WellCodeIsDelicious/WSATest/update/magiskstable.appversion").text.replace('\n', '')
-with open('../magiskstable.appversion', 'w') as file:
+with open('magiskstable.appversion', 'w') as file:
     file.write(currentver)
 if not new_version_found:
     # Get latest version
