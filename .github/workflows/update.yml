@@ -32,7 +32,7 @@ jobs:
             env_file = os.getenv('GITHUB_ENV')
             new_version_found = False
             currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskstable.appversion").text.replace('\n', '')
-            with open('../magiskstable.appversion', 'w') as file:
+            with open('magiskstable.appversion', 'w') as file:
                 file.write(currentver)
             if not new_version_found:
                 # Get latest version
