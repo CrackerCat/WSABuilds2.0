@@ -17,8 +17,9 @@ jobs:
           pip3 install beautifulsoup4 lxml
  
       - name: Get app version ✅
-        working-directory: 'MagiskOnWSA/Update Check'
-        run: python3 MagiskStableUpdateCheck.py
+        run: | 
+           wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskStableUpdateCheck.py
+           python3 MagiskStableUpdateCheck.py
         
                 
       - name: Update App version 🔗
