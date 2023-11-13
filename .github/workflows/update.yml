@@ -1,0 +1,70 @@
+name: Check update
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Check update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ♻️
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies 🧑‍🏭
+        run: |
+          pip3 install beautifulsoup4 lxml
+
+      - name: Create branch if not found 🏗️
+        run: |
+          git checkout -f update || git switch --discard-changes --orphan update
+
+      - name: Check Magisk Stable Updates ✅
+        run: |
+            wget 
+            python3 MagiskStableUpdateCheck.py    
+
+      - name: Check Magisk Canary Updates ✅
+        run: |
+            wget 
+            python3 MagiskCanaryUpdateCheck.py     
+
+      - name: Update App version 🔗
+        uses: stefanzweifel/git-auto-commit-action@v5.0.0
+        with:
+          branch: update
+          push_options: '--force'
+          file_pattern: '*.appversion'
+          commit_message: ${{ env.MSG || 'Update App Version' }}
+          create_branch: true
+          
+      - name: Delete old workflow run ❌
+        uses: Mattraks/delete-workflow-runs@v2.0.5
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
+          delete_workflow_pattern: "Check update"
+
+      - name: Check Variables
+        run: |
+          echo ${{ env.SHOULD_BUILD }}
+          echo ${{ env.RELEASE_TYPE }}
+          echo ${{ env.MSG }}
+          echo ${{ env.MAGISK_CANARY_MSG }}
+          echo ${{ env.MAGISK_STABLE_MSG }}
+          echo ${{ env.KERNEL_SU_MSG }}
+          echo ${{ env.LATEST_WSA_VER }}
+          echo ${{ env.MTG_MSG }}
+        
+    outputs:
+      SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
+      RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
+      WSA_UPDATE_MESSAGE: ${{ env.MSG }}
+      MAGISK_CANARY_MSG: ${{ env.MAGISK_CANARY_MSG }}
+      MAGISK_STABLE_MSG: ${{ env.MAGISK_STABLE_MSG }}
+      KERNEL_SU_MSG: ${{ env.KERNEL_SU_MSG }}
+      WSA_VER: ${{ env.LATEST_WSA_VER }}
+      MTG_MSG: ${{ env.MTG_MSG }}
