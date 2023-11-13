@@ -18,7 +18,7 @@ jobs:
 
       - name: Create branch if not found 🏗️
         run: |
-          git checkout -f update || git switch --discard-changes --orphan update
+          git rev-parse --verify update > /dev/null 2>&1 || git switch --discard-changes --orphan update
 
       - name: Check Magisk Stable Updates ✅
         run: |
