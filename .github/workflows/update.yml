@@ -107,8 +107,6 @@ jobs:
                 if currentver != latestver:
                     print("New version found: " + latestver)
                     new_version_found = True
-                    # Write appversion content
-                    subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
                     with open('kernelsumsg.appversion', 'w+') as file:
                         file.seek(0)
                         file.truncate()
