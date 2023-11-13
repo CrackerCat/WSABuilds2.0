@@ -18,8 +18,14 @@ jobs:
 
       - name: Create branch if not found 🏗️
         run: |
-          git rev-parse --verify update > /dev/null 2>&1 || git switch --discard-changes --orphan update
-
+            git rev-parse --verify update
+            if [ $? -ne 0 ]; then
+                echo "Branch does not exist, creating..."
+                git switch --discard-changes --orphan update
+            else
+                echo "Branch exists, not creating."
+            fi
+            
       - name: Check Magisk Stable Updates ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskCanaryUpdateCheck.py
