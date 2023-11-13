@@ -22,12 +22,12 @@ jobs:
 
       - name: Check Magisk Stable Updates ✅
         run: |
-            wget 
+            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskCanaryUpdateCheck.py
             python3 MagiskStableUpdateCheck.py    
 
       - name: Check Magisk Canary Updates ✅
         run: |
-            wget 
+            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskCanaryUpdateCheck.py
             python3 MagiskCanaryUpdateCheck.py     
 
       - name: Update App version 🔗
