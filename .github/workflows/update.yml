@@ -5,8 +5,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
-    name: Check update
+ 
+  wsaupdatecheck:
+    name: Check WSA updates
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ♻️
@@ -15,12 +16,293 @@ jobs:
       - name: Install Dependencies 🧑‍🏭
         run: |
           pip3 install beautifulsoup4 lxml
- 
-      - name: Get app version ✅
-        run: | 
-           wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskStableUpdateCheck.py
-           python3 MagiskStableUpdateCheck.py
-        
+          
+      - name: Get WSA Version ✅
+        shell: python
+        run: |
+            import base64
+            import os
+            import html
+            import json
+            import re
+            import requests
+            import logging
+            import subprocess
+            from typing import Any, OrderedDict
+            from xml.dom import minidom
+            from requests import Session
+            from packaging import version
+            class Prop(OrderedDict):
+                def __init__(self, props: str = ...) -> None:
+                    super().__init__()
+                    for i, line in enumerate(props.splitlines(False)):
+                        if '=' in line:
+                            k, v = line.split('=', 1)
+                            self[k] = v
+                        else:
+                            self[f".{i}"] = line
+                def __setattr__(self, __name: str, __value: Any) -> None:
+                    self[__name] = __value
+                def __repr__(self):
+                    return '\n'.join(f'{item}={self[item]}' for item in self)
+            logging.captureWarnings(True)
+            env_file = os.getenv('GITHUB_ENV')
+            cat_id = '858014f3-3934-4abe-8078-4aa193e74ca8'
+            release_type = "WIF"
+            new_version_found = False
+            session = Session()
+            session.verify = False
+            git = (
+                "git checkout -f update || git switch --discard-changes --orphan update"
+            )
+            users = {""}
+            try:
+                response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
+                if response.status_code == 200:
+                    content = response.json()["content"]
+                    content = content.encode("utf-8")
+                    content = base64.b64decode(content)
+                    text = content.decode("utf-8")
+                    user_code = Prop(text).get("user_code")
+                    updatetime = Prop(text).get("update_time")
+                    print("Successfully get user token from server!")
+                    print(f"Last update time: {updatetime}\n")
+                else:
+                    user_code = ""
+                    print(f"Failed to get user token from server! Error code: {response.status_code}\n")
+            except:
+                user_code = ""
+            if user_code == "":
+                users = {""}
+            else:
+                users = {"", user_code}
+            for user in users:
+                if user == "":
+                    print("Checking WSA Stable version...\n")
+                    release_type = "retail"
+                else:
+                    print("Checking WSA Insider version...\n")
+                    release_type = "WIF"
+                currentver = requests.get(f"https://raw.githubusercontent.com/WellCodeIsDelicious/WSATest/update/" + release_type + ".appversion").text.replace('\n', '')
+                # Write for pushing later
+                file = open('../' + release_type + '.appversion', 'w')
+                file.write(currentver)
+                if new_version_found:
+                    break
+                with open("../xml/GetCookie.xml", "r") as f:
+                    cookie_content = f.read().format(user)
+                    f.close()
+                try:
+                    out = session.post(
+                        'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
+                        data=cookie_content,
+                        headers={'Content-Type': 'application/soap+xml; charset=utf-8'}
+                    )
+                except:
+                    print("Network Error!")
+                    break
+                doc = minidom.parseString(out.text)
+                cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
+                with open("../xml/WUIDRequest.xml", "r") as f:
+                    cat_id_content = f.read().format(user, cookie, cat_id, release_type)
+                    f.close()
+                try:
+                    out = session.post(
+                        'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
+                        data=cat_id_content,
+                        headers={'Content-Type': 'application/soap+xml; charset=utf-8'}
+                    )
+                except:
+                    print("Network Error!")
+                    break
+                doc = minidom.parseString(html.unescape(out.text))
+                filenames = {}
+                for node in doc.getElementsByTagName('ExtendedUpdateInfo')[0].getElementsByTagName('Updates')[0].getElementsByTagName('Update'):
+                    node_xml = node.getElementsByTagName('Xml')[0]
+                    node_files = node_xml.getElementsByTagName('Files')
+                    if not node_files:
+                        continue
+                    else:
+                        for node_file in node_files[0].getElementsByTagName('File'):
+                            if node_file.hasAttribute('InstallerSpecificIdentifier') and node_file.hasAttribute('FileName'):
+                                filenames[node.getElementsByTagName('ID')[0].firstChild.nodeValue] = (f"{node_file.attributes['InstallerSpecificIdentifier'].value}_{node_file.attributes['FileName'].value}",
+                                                                                                      node_xml.getElementsByTagName('ExtendedProperties')[0].attributes['PackageIdentityName'].value)
+                identities = {}
+                for node in doc.getElementsByTagName('NewUpdates')[0].getElementsByTagName('UpdateInfo'):
+                    node_xml = node.getElementsByTagName('Xml')[0]
+                    if not node_xml.getElementsByTagName('SecuredFragment'):
+                        continue
+                    else:
+                        id = node.getElementsByTagName('ID')[0].firstChild.nodeValue
+                        update_identity = node_xml.getElementsByTagName('UpdateIdentity')[0]
+                        if id in filenames:
+                            fileinfo = filenames[id]
+                            if fileinfo[0] not in identities:
+                                identities[fileinfo[0]] = ([update_identity.attributes['UpdateID'].value,
+                                                        update_identity.attributes['RevisionNumber'].value], fileinfo[1])
+                wsa_build_ver = 0
+                for filename, value in identities.items():
+                    if re.match(f"MicrosoftCorporationII.WindowsSubsystemForAndroid_.*.msixbundle", filename):
+                        tmp_wsa_build_ver = re.search(r"\d{4}.\d{5}.\d{1,}.\d{1,}", filename).group()
+                        if (wsa_build_ver == 0):
+                            wsa_build_ver = tmp_wsa_build_ver
+                        elif version.parse(wsa_build_ver) < version.parse(tmp_wsa_build_ver):
+                            wsa_build_ver = tmp_wsa_build_ver
+                if version.parse(currentver) < version.parse(wsa_build_ver):
+                    print("New version found: " + wsa_build_ver)
+                    new_version_found = True
+                    subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
+                    file.seek(0)
+                    file.truncate()
+                    file.write(wsa_build_ver)
+                    msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
+                    with open(env_file, "a") as wr:
+                        wr.write("SHOULD_BUILD=yes\nRELEASE_TYPE=" + release_type + "\nMSG=" + msg + "\nLATEST_WSA_VER=" + str(wsa_build_ver) + "\n")
+                file.close()
+          
+
+  componentsupdatecheck:
+    name: Check updates for components
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ♻️
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies 🧑‍🏭
+        run: |
+          pip3 install beautifulsoup4 lxml
+
+      - name: Create branch if not found 🏗️
+        run: |
+          git checkout -f update || git switch --discard-changes --orphan update
+
+      - name: Get Magisk Stable Version ✅
+        shell: python
+        run: |
+            import os
+            import json
+            import requests
+            import logging
+            import subprocess
+            logging.captureWarnings(True)
+            env_file = os.getenv('GITHUB_ENV')
+            new_version_found = False
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskstable.appversion").text.replace('\n', '')
+            with open('magiskstable.appversion', 'w') as file:
+                file.write(currentver)
+            if not new_version_found:
+                # Get latest version
+                latestver = ""
+                magiskstablemsg = ""
+                latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/stable.json").content)['magisk']['version'].replace('\n', '')
+                magiskstablemsg="Update Magisk Stable Version from `v" + currentver + "` to `v" + latestver + "`"
+                if currentver != latestver:
+                    print("New version found: " + latestver)
+                    new_version_found = True
+                    # Write appversion content
+                    with open('magiskstable.appversion', 'w+') as file:
+                        file.seek(0)
+                        file.truncate()
+                        file.write(latestver)
+                    # Write Github Environment
+                    with open(env_file, "a") as wr:
+                        wr.write(f"MAGISK_STABLE_MSG={magiskstablemsg}\n")
+                file.close()      
+                
+      - name: Get Magisk Canary Version ✅
+        shell: python
+        run: |
+            import os
+            import json
+            import requests
+            import logging
+            import subprocess
+            logging.captureWarnings(True)
+            env_file = os.getenv('GITHUB_ENV')
+            new_version_found = False
+            currentver = requests.get(f"https://raw.githubusercontent.com/WellCodeIsDelicious/WSATest/update/magiskcanary.appversion").text.replace('\n', '')
+            with open('magiskcanary.appversion', 'w') as file:
+                file.write(currentver)
+            if not new_version_found:
+                # Get latest version
+                latestver = ""
+                magiskcanarymsg = ""
+                latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/canary.json").content)['magisk']['version'].replace('\n', '')
+                magiskcanarymsg="Update Magisk Canary Version from `v" + currentver + "` to `v" + latestver + "`"
+                if currentver != latestver:
+                    print("New version found: " + latestver)
+                    new_version_found = True
+                    with open('magiskcanary.appversion', 'w+') as file:
+                        file.seek(0)
+                        file.truncate()
+                        file.write(latestver)
+                    with open(env_file, "a") as wr:
+                        wr.write(f"MAGISK_CANARY_MSG={magiskcanarymsg}\n")
+                file.close()        
+
+      - name: Get KernelSU Version ✅
+        shell: python
+        run: |
+            import os
+            import json
+            import requests
+            import logging
+            import subprocess
+            logging.captureWarnings(True)
+            env_file = os.getenv('GITHUB_ENV')
+            new_version_found = False
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/kernelsu.appversion").text.replace('\n', '')
+            with open('kernelsu.appversion', 'w') as file:
+                file.write(currentver)
+            if not new_version_found:
+                # Get latest version
+                latestver = ""
+                kernelsumsg = ""
+                latestver = json.loads(requests.get(f"https://api.github.com/repos/tiann/kernelsu/releases/latest").content)['tag_name'].replace('v', '').replace('\n', '')
+                kernelsumsg="Update KernelSU Version from `v" + currentver + "` to `v" + latestver + "`"
+                if currentver != latestver:
+                    print("New version found: " + latestver)
+                    new_version_found = True
+                    with open('kernelsumsg.appversion', 'w+') as file:
+                        file.seek(0)
+                        file.truncate()
+                        file.write(latestver)
+                    # Write Github Environment
+                    with open(env_file, "a") as wr:
+                        wr.write(f"KERNEL_SU_MSG={kernelsumsg}\n")
+                file.close()            
+
+      - name: Get MindTheGapps Version ✅
+        shell: python
+        run: |
+            import os
+            import json
+            import requests
+            import logging
+            import subprocess
+            logging.captureWarnings(True)
+            env_file = os.getenv('GITHUB_ENV')
+            new_version_found = False
+            currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/gapps.appversion").text.replace('\n', '')
+            with open('gapps.appversion', 'w') as file:
+                file.write(currentver)
+            if not new_version_found:
+                latestver = ""
+                mtgmsg = ""
+                latestver = json.loads(requests.get(f"https://api.github.com/repos/YT-Advanced/MindTheGappsBuilder/releases/latest").content)['name'].replace('\n', '')
+                mtgmsg="Update MindTheGapps Version from `v" + currentver + "` to `v" + latestver + "`"
+                if currentver != latestver:
+                    print("New version found: " + latestver)
+                    new_version_found = True
+                    with open('gapps.appversion', 'w+') as file:
+                        file.seek(0)
+                        file.truncate()
+                        file.write(latestver)
+                    with open(env_file, "a") as wr:
+                        wr.write(f"MTG_MSG={mtgmsg}\n")
+                file.close()   
+
+                
                 
       - name: Update App version 🔗
         uses: stefanzweifel/git-auto-commit-action@v5.0.0
