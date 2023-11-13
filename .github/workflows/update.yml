@@ -18,7 +18,7 @@ jobs:
 
       - name: Create branch if not found 🏗️
         run: |
-            git show-ref --verify --quiet refs/heads/update
+            git show-ref --verify --quiet refs/heads/update || true
             if [ $? -ne 0 ]; then
                 echo "Branch does not exist, creating..."
                 git switch --discard-changes --orphan update
