@@ -140,7 +140,6 @@ jobs:
                 if currentver != latestver:
                     print("New version found: " + latestver)
                     new_version_found = True
-                    subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
                     with open('gapps.appversion', 'w+') as file:
                         file.seek(0)
                         file.truncate()
@@ -149,7 +148,6 @@ jobs:
                         wr.write(f"MTG_MSG={mtgmsg}\n")
                 file.close()        
                 
-      
       - name: Update App version 🔗
         uses: stefanzweifel/git-auto-commit-action@v5.0.0
         with:
