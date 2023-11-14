@@ -37,7 +37,6 @@ jobs:
             python3 KernelSUUpdateCheck.py
 
       - name: Get MindTheGapps Version ✅
-        shell: python
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MTGUpdateCheck.py
             python3 MTGUpdateCheck.py
