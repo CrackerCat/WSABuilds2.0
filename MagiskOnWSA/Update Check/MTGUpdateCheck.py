@@ -31,4 +31,4 @@ if not new_version_found:
         mtgmsg = "MindTheGapps Package Version: `" + latestver + "`"
         with open(env_file, "a") as wr:
            wr.write(f"MTG_MSG={mtgmsg}\n")
-  file.close()   
+    file.close()   
