@@ -57,7 +57,7 @@ def WSAChecker(user, release_type):
     if new_version_found:
         return 0;
     # Get information
-    with open("../xml/GetCookie.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/GetCookie.xml", "r") as f:
         cookie_content = f.read().format(user)
         f.close()
     try:
@@ -71,7 +71,7 @@ def WSAChecker(user, release_type):
         return 1
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
-    with open("../xml/WUIDRequest.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
         cat_id_content = f.read().format(user, cookie, cat_id, release_type)
         f.close()
     try:
