@@ -27,4 +27,8 @@ if not new_version_found:
             file.write(latestver)
         with open(env_file, "a") as wr:
              wr.write(f"KERNEL_SU_MSG={kernelsumsg}\n")
+    else:
+        kernelsumsg = "KernelSU Version: `" + latestver + "`"
+        with open(env_file, "a") as wr:
+             wr.write(f"KERNEL_SU_MSG={kernelsumsg}\n")
     file.close() 
