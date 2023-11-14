@@ -77,7 +77,7 @@ for user in users:
         print("Checking WSA Insider version...\n")
         release_type = "WIF"
 
-    currentver = requests.get(f"https://raw.githubusercontent.com/WellCodeIsDelicious/WSATest/update/" + release_type + ".appversion").text.replace('\n', '')
+    currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/" + release_type + ".appversion").text.replace('\n', '')
 
     # Write for pushing later
     file = open('../' + release_type + '.appversion', 'w')
