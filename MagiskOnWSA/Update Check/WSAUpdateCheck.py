@@ -86,7 +86,7 @@ for user in users:
     if new_version_found:
         break
     # Get information
-    with open("../xml/GetCookie.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/GetCookie.xml", "r") as f:
         cookie_content = f.read().format(user)
         f.close()
     try:
@@ -100,7 +100,7 @@ for user in users:
         break
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
-    with open("../xml/WUIDRequest.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
         cat_id_content = f.read().format(user, cookie, cat_id, release_type)
         f.close()
     try:
