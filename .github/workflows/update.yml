@@ -44,7 +44,19 @@ jobs:
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MTGUpdateCheck.py
             python3 MTGUpdateCheck.py
-                
+
+      - name: Check GitHub ENVs
+        run: |
+            echo ${{ env.SHOULD_BUILD }}
+            echo ${{ env.INSIDER }}
+            echo ${{ env.MSG }}
+            echo ${{ env.MAGISK_CANARY_MSG }}
+            echo ${{ env.MAGISK_STABLE_MSG }}
+            echo ${{ env.KERNEL_SU_MSG }}
+            echo ${{ env.LATEST_WIF_VER }}
+            echo ${{ env.LATEST_RETAIL_VER }}
+            echo ${{ env.MTG_MSG }}    
+             
       - name: Update App version 🔗
         uses: stefanzweifel/git-auto-commit-action@v5.0.0
         with:
@@ -65,7 +77,7 @@ jobs:
           
       - name: Checkout Again! 🔄
         uses: actions/checkout@v4.1.1
-        
+      
     outputs:
       SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
       INSIDER_BUILD: ${{ env.INSIDER }}
