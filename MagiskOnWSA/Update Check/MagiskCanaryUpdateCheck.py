@@ -23,4 +23,4 @@ if not new_version_found:
             file.write(latestver)
         with open(env_file, "a") as wr:
             wr.write(f"MAGISK_CANARY_MSG={magiskcanarymsg}\n")
-     file.close()        
+    file.close()        
