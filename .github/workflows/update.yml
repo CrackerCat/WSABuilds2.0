@@ -21,6 +21,10 @@ jobs:
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAUpdateCheck.py
             python3 WSAUpdateCheck.py
 
+      - name: Create branch if not found 🏗️
+        run: |
+          git checkout -f update || git switch --discard-changes --orphan update
+
       - name: Get Magisk Stable Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskStableUpdateCheck.py
