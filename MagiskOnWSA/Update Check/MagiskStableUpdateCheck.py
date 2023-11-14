@@ -3,24 +3,13 @@ import json
 import requests
 import logging
 import subprocess
-
 logging.captureWarnings(True)
 env_file = os.getenv('GITHUB_ENV')
 new_version_found = False
-git = (
-    "git checkout -f update || git switch --discard-changes --orphan update"
-)
-currentver = requests.get(f"https://raw.githubusercontent.com/WellCodeIsDelicious/WSATest/update/magiskstable.appversion").text.replace('\n', '')
-
-# Define the path to the file in the home directory
-home_dir = os.path.expanduser('~')
-file_path = os.path.join(home_dir, 'magiskcanary.appversion')
-
-with open(file_path, 'w') as file:
+currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/magiskstable.appversion").text.replace('\n', '')
+with open('magiskstable.appversion', 'w') as file:
     file.write(currentver)
-
 if not new_version_found:
-    # Get latest version
     latestver = ""
     magiskstablemsg = ""
     latestver = json.loads(requests.get(f"https://github.com/topjohnwu/magisk-files/raw/master/stable.json").content)['magisk']['version'].replace('\n', '')
@@ -28,8 +17,7 @@ if not new_version_found:
     if currentver != latestver:
         print("New version found: " + latestver)
         new_version_found = True
-        subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
-        with open(file_path, 'w+') as file:
+        with open('magiskstable.appversion', 'w+') as file:
             file.seek(0)
             file.truncate()
             file.write(latestver)
