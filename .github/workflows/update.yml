@@ -5,9 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
- 
-  wsaupdatecheck:
-    name: Check WSA updates
+  check:
+    name: Check updates for components
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ♻️
@@ -16,33 +15,12 @@ jobs:
       - name: Install Dependencies 🧑‍🏭
         run: |
           pip3 install beautifulsoup4 lxml
-          
+
       - name: Get WSA Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAUpdateCheck.py
             python3 WSAUpdateCheck.py
           
-      - name: Update App version 🔗
-        uses: stefanzweifel/git-auto-commit-action@v5.0.0
-        with:
-          branch: update
-          push_options: '--force'
-          file_pattern: '*.appversion'
-          commit_message: ${{ env.MSG || 'Update App Version' }}
-          create_branch: true
-
-  componentsupdatecheck:
-    name: Check updates for components
-    runs-on: ubuntu-latest
-    needs: wsaupdatecheck
-    steps:
-      - name: Checkout ♻️
-        uses: actions/checkout@v4
-
-      - name: Install Dependencies 🧑‍🏭
-        run: |
-          pip3 install beautifulsoup4 lxml
-
       - name: Create branch if not found 🏗️
         run: |
           git checkout -f update || git switch --discard-changes --orphan update
