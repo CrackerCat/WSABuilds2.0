@@ -77,7 +77,7 @@ jobs:
       RETAIL_VER: ${{ env.LATEST_RETAIL_VER }}
       MTG_MSG: ${{ env.MTG_MSG }}
 
-check-and-create-tag:
+  check-and-create-tag:
     name: Creates the release tags
     needs: [check]
     if: needs.check.outputs.SHOULD_BUILD == 'yes'
