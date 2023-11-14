@@ -27,4 +27,8 @@ if not new_version_found:
             file.write(latestver)
         with open(env_file, "a") as wr:
             wr.write(f"MAGISK_STABLE_MSG={magiskstablemsg}\n")
+    else:
+        magiskstablemsg = "Magisk Stable Version: `" + latestver + "`" 
+        with open(env_file, "a") as wr:
+            wr.write(f"MAGISK_STABLE_MSG={magiskstablemsg}\n")
     file.close()
