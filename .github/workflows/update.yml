@@ -48,7 +48,7 @@ jobs:
       - name: Check GitHub ENVs
         run: |
             echo ${{ env.SHOULD_BUILD }}
-            echo ${{ env.INSIDER }}
+            echo ${{ env.RELEASE_TYPE }}
             echo ${{ env.MSG }}
             echo ${{ env.MAGISK_CANARY_MSG }}
             echo ${{ env.MAGISK_STABLE_MSG }}
@@ -80,15 +80,14 @@ jobs:
       
     outputs:
       SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
-      INSIDER_BUILD: ${{ env.INSIDER }}
+      RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
       WSA_UPDATE_MESSAGE: ${{ env.MSG }}
       MAGISK_CANARY_MSG: ${{ env.MAGISK_CANARY_MSG }}
       MAGISK_STABLE_MSG: ${{ env.MAGISK_STABLE_MSG }}
       KERNEL_SU_MSG: ${{ env.KERNEL_SU_MSG }}
-      WIF_VER: ${{ env.LATEST_WIF_VER }}
-      RETAIL_VER: ${{ env.LATEST_RETAIL_VER }}
+      WSA_VER: ${{ env.LATEST_WSA_VER }}
       MTG_MSG: ${{ env.MTG_MSG }}
-
+      
   check-and-create-tag:
     name: Creates the release tags
     needs: [check]
