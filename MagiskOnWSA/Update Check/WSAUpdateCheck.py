@@ -129,7 +129,9 @@ def WSAChecker(user, release_type):
         # Write Github Environment
         msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
         with open(env_file, "a") as wr:
-            wr.write("SHOULD_BUILD=yes\nRELEASE_TYPE=" + release_type + "\nMSG=" + msg)
+            wr.write("SHOULD_BUILD=yes\n")
+            wr.write("RELEASE_TYPE=" + release_type + "\n")
+            wr.write("MSG=" + msg + "\n")
     file.close()
 
 # Get user_code (Thanks to @bubbles-wow because of his repository)
