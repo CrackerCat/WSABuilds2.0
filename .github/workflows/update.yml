@@ -76,3 +76,202 @@ jobs:
       WIF_VER: ${{ env.LATEST_WIF_VER }}
       RETAIL_VER: ${{ env.LATEST_RETAIL_VER }}
       MTG_MSG: ${{ env.MTG_MSG }}
+
+check-and-create-tag:
+    name: Creates the release tags
+    needs: [check]
+    if: needs.check.outputs.SHOULD_BUILD == 'yes'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🔄
+        uses: actions/checkout@v4.1.1
+
+      - name: Prepare release tag 🏷️
+        id: releasetag
+        shell: bash
+        run: |
+          if [[ "${{ needs.check.outputs.RELEASE_TYPE }}" == "WIF" ]]; then
+            currentver=${{ needs.check.outputs.WSA_VER }}
+          else
+            currentver=${{ needs.check.outputs.WSA_VER }}
+          fi
+          if [[ -z "$currentver" ]]; then
+              echo "currentver is empty. Please check the file contents."
+              exit 1
+          fi
+          echo "WSA_VER=$currentver" >> $GITHUB_ENV
+          echo "WIN11X64_TAG=Windows_11_$currentver" >> $GITHUB_ENV
+          echo "WIN11ARM64_TAG=Windows_11_${currentver}_arm64" >> $GITHUB_ENV
+          echo "WIN10X64_TAG=Windows_10_$currentver" >> $GITHUB_ENV
+                
+      - name: Run Tag Checks for Windows 11 x64 Releases
+        uses: mukunku/tag-exists-action@v1.4.0
+        id: checkTag1
+        with:
+          tag: ${{ env.WIN11X64_TAG }}
+          repo: 'WellCodeIsDelicious/WSATest'
+      - run: echo ${{ steps.checkTag1.outputs.exists }}
+      
+      - name: Stop workflow if tag exists
+        if: steps.checkTag.outputs.exists == 'true'
+        run: exit 1
+
+      - name: Run Tag Checks for Windows 11 arm64 Releases
+        uses: mukunku/tag-exists-action@v1.4.0
+        id: checkTag2
+        with:
+          tag: ${{ env.WIN11ARM64_TAG }}
+          repo: 'WellCodeIsDelicious/WSATest'
+      - run: echo ${{ steps.checkTag.outputs.exists }}
+      
+      - name: Stop workflow if tag exists
+        if: steps.checkTag2.outputs.exists == 'true'
+        run: exit 1
+
+      - name: Run Tag Checks for Windows 10 x64 Releases
+        uses: mukunku/tag-exists-action@v1.4.0
+        id: checkTag3
+        with:
+          tag: ${{ env.WIN10X64_TAG }}
+          repo: 'WellCodeIsDelicious/WSATest'
+      - run: echo ${{ steps.checkTag.outputs.exists }}
+      
+      - name: Stop workflow if tag exists
+        if: steps.checkTag3.outputs.exists == 'true'
+        run: exit 1
+        
+      - name: Download Release Notes 📥
+        run: |
+          wget https://gist.github.com/MustardChef/edb0dfc50ab4942cd5914cef6a81602e/raw/ -P ${{ github.workspace }} -O Windows11x64.md
+          wget https://gist.github.com/MustardChef/3ae3343bb98f6e158ce951ec09fd3661/raw/ -P ${{ github.workspace }} -O Windows11arm64.md
+          wget https://gist.github.com/MustardChef/f2ebafde3a3072cac7e6f726da3ffa50/raw/ -P ${{ github.workspace }} -O Windows10x64.md
+          ls
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+            
+      - name: Update Release Notes for Windows 11 x64 notes📝
+        run: |
+            import os
+            import re
+            from datetime import datetime
+            date = datetime.utcnow().strftime('%d/%m/%Y')
+            time = datetime.utcnow().strftime('%H:%M:%S')
+            file_path = os.path.join(os.environ['GITHUB_WORKSPACE'], 'Windows11x64.md')
+            with open(file_path, 'r') as file:
+                file_data = file.read()
+            def custom_escape(string):
+                return string.replace('\\', '')
+            file_data = re.sub('<<DATEOFRELEASE>>', date, file_data)
+            file_data = re.sub('<<TIMEOFRELEASE>>', time, file_data)
+            file_data = re.sub('<<REASONFORRELEASE>>', 'Initial Release', file_data)
+            file_data = re.sub('<<WSAUPDATEMSG>>', custom_escape(os.environ['WSA_UPDATE_MESSAGE']), file_data)
+            file_data = re.sub('<<WSAANDROIDVERSION>>', 'Android 13', file_data)
+            file_data = re.sub('<<MTGPACKAGENAME>>', custom_escape(os.environ['MTG_MSG']), file_data)
+            file_data = re.sub('<<MAGISKCANARYVERSION>>', custom_escape(os.environ['MAGISK_CANARY_MSG']), file_data)
+            file_data = re.sub('<<MAGISKSTABLEVERSION>>', custom_escape(os.environ['MAGISK_STABLE_MSG']), file_data)
+            file_data = re.sub('<<KERNELSUVERSION>>', custom_escape(os.environ['KERNEL_SU_MSG']), file_data)
+            with open(file_path, 'w') as file:
+                file.write(file_data)
+        shell: python  
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+          WSA_UPDATE_MESSAGE: ${{ needs.check.outputs.WSA_UPDATE_MESSAGE }}
+          MTG_MSG: ${{ needs.check.outputs.MTG_MSG }}
+          MAGISK_CANARY_MSG: ${{ needs.check.outputs.MAGISK_CANARY_MSG }}
+          MAGISK_STABLE_MSG: ${{ needs.check.outputs.MAGISK_STABLE_MSG }}
+          KERNEL_SU_MSG: ${{ needs.check.outputs.KERNEL_SU_MSG }} 
+
+      - name: Update Release Notes for Windows 11 arm64 notes📝
+        run: |
+            import os
+            import re
+            from datetime import datetime
+            date = datetime.utcnow().strftime('%d/%m/%Y')
+            time = datetime.utcnow().strftime('%H:%M:%S')
+            file_path = os.path.join(os.environ['GITHUB_WORKSPACE'], 'Windows11arm64.md')
+            with open(file_path, 'r') as file:
+                file_data = file.read()
+            def custom_escape(string):
+                return string.replace('\\', '')
+            file_data = re.sub('<<DATEOFRELEASE>>', date, file_data)
+            file_data = re.sub('<<TIMEOFRELEASE>>', time, file_data)
+            file_data = re.sub('<<REASONFORRELEASE>>', 'Initial Release', file_data)
+            file_data = re.sub('<<WSAUPDATEMSG>>', custom_escape(os.environ['WSA_UPDATE_MESSAGE']), file_data)
+            file_data = re.sub('<<WSAANDROIDVERSION>>', 'Android 13', file_data)
+            file_data = re.sub('<<MTGPACKAGENAME>>', custom_escape(os.environ['MTG_MSG']), file_data)
+            file_data = re.sub('<<MAGISKCANARYVERSION>>', custom_escape(os.environ['MAGISK_CANARY_MSG']), file_data)
+            file_data = re.sub('<<MAGISKSTABLEVERSION>>', custom_escape(os.environ['MAGISK_STABLE_MSG']), file_data)
+            file_data = re.sub('<<KERNELSUVERSION>>', custom_escape(os.environ['KERNEL_SU_MSG']), file_data)
+            with open(file_path, 'w') as file:
+                file.write(file_data)
+        shell: python  
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+          WSA_UPDATE_MESSAGE: ${{ needs.check.outputs.WSA_UPDATE_MESSAGE }}
+          MTG_MSG: ${{ needs.check.outputs.MTG_MSG }}
+          MAGISK_CANARY_MSG: ${{ needs.check.outputs.MAGISK_CANARY_MSG }}
+          MAGISK_STABLE_MSG: ${{ needs.check.outputs.MAGISK_STABLE_MSG }}
+          KERNEL_SU_MSG: ${{ needs.check.outputs.KERNEL_SU_MSG }} 
+
+      - name: Update Release Notes for Windows 10 x64 notes📝
+        run: |
+            import os
+            import re
+            from datetime import datetime
+            date = datetime.utcnow().strftime('%d/%m/%Y')
+            time = datetime.utcnow().strftime('%H:%M:%S')
+            file_path = os.path.join(os.environ['GITHUB_WORKSPACE'], 'Windows10x64.md')
+            with open(file_path, 'r') as file:
+                file_data = file.read()
+            def custom_escape(string):
+                return string.replace('\\', '')
+            file_data = re.sub('<<DATEOFRELEASE>>', date, file_data)
+            file_data = re.sub('<<TIMEOFRELEASE>>', time, file_data)
+            file_data = re.sub('<<REASONFORRELEASE>>', 'Initial Release', file_data)
+            file_data = re.sub('<<WSAUPDATEMSG>>', custom_escape(os.environ['WSA_UPDATE_MESSAGE']), file_data)
+            file_data = re.sub('<<WSAANDROIDVERSION>>', 'Android 13', file_data)
+            file_data = re.sub('<<MTGPACKAGENAME>>', custom_escape(os.environ['MTG_MSG']), file_data)
+            file_data = re.sub('<<MAGISKCANARYVERSION>>', custom_escape(os.environ['MAGISK_CANARY_MSG']), file_data)
+            file_data = re.sub('<<MAGISKSTABLEVERSION>>', custom_escape(os.environ['MAGISK_STABLE_MSG']), file_data)
+            file_data = re.sub('<<KERNELSUVERSION>>', custom_escape(os.environ['KERNEL_SU_MSG']), file_data)
+            with open(file_path, 'w') as file:
+                file.write(file_data)
+        shell: python  
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+          WSA_UPDATE_MESSAGE: ${{ needs.check.outputs.WSA_UPDATE_MESSAGE }}
+          MTG_MSG: ${{ needs.check.outputs.MTG_MSG }}
+          MAGISK_CANARY_MSG: ${{ needs.check.outputs.MAGISK_CANARY_MSG }}
+          MAGISK_STABLE_MSG: ${{ needs.check.outputs.MAGISK_STABLE_MSG }}
+          KERNEL_SU_MSG: ${{ needs.check.outputs.KERNEL_SU_MSG }} 
+          
+      - name: Create Tag and Release for Windows 11 x64 release ✍🏼
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.WIN11X64_TAG }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body_path: ${{github.workspace}}/Windows11x64.md
+          name: Windows Subsystem For Android ${{ env.WSA_VER }} for Windows 11 x64
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+
+      - name: Create Tag and Release for Windows 11 arm64 release ✍🏼
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.WIN11ARM64_TAG }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body_path: ${{github.workspace}}/Windows11arm64.md
+          name: Windows Subsystem For Android ${{ env.WSA_VER }} for Windows 11 arm64
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+
+      - name: Create Tag and Release for Windows 10 x64 release ✍🏼
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.WIN10X64_TAG }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body_path: ${{github.workspace}}/Windows10x64.md
+          name: Windows Subsystem For Android ${{ env.WSA_VER }} for Windows 10 x64
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+
