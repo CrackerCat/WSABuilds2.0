@@ -159,7 +159,7 @@ for user in users:
         # Write Github Environment
         msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
         with open(env_file, "a") as wr:
-            wr.write("SHOULD_BUILD=yes\n")
-            wr.write("RELEASE_TYPE=" + release_type + "\n")
-            wr.write("MSG=" + msg + "\n")
+            wr.write(f"SHOULD_BUILD=yes\n")
+            wr.write(f"RELEASE_TYPE=" + release_type + "\n")
+            wr.write(f"MSG=" + msg + "\n")
     file.close()
