@@ -32,7 +32,7 @@ class Prop(OrderedDict):
 logging.captureWarnings(True)
 env_file = os.getenv('GITHUB_ENV')
 
-#Catagory ID
+#Category ID
 cat_id = '858014f3-3934-4abe-8078-4aa193e74ca8'
 
 release_type = "WIF"
@@ -62,8 +62,9 @@ try:
     else:
         user_code = ""
         print(f"Failed to get user token from server! Error code: {response.status_code}\n")
-except:
+except requests.exceptions.RequestException as e:
     user_code = ""
+    print(f"Failed to get user token from server! Error: {e}\n")
 
 if user_code == "":
     users = {""}
@@ -78,40 +79,38 @@ for user in users:
         print("Checking WSA Insider version...\n")
         release_type = "WIF"
 
-    currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/" + release_type + ".appversion").text.replace('\n', '')
+    currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/{release_type}.appversion").text.replace('\n', '')
 
     # Write for pushing later
-    file = open(release_type + '.appversion', 'w')
-    file.write(currentver)
+    with open(f'{release_type}.appversion', 'w') as file:
+        file.write(currentver)
 
     if new_version_found:
         break
     # Get information
     with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/GetCookie.xml", "r") as f:
         cookie_content = f.read().format(user)
-        f.close()
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
             data=cookie_content,
             headers={'Content-Type': 'application/soap+xml; charset=utf-8'}
         )
-    except:
-        print("Network Error!")
+    except requests.exceptions.RequestException as e:
+        print(f"Network Error: {e}")
         break
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
     with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
         cat_id_content = f.read().format(user, cookie, cat_id, release_type)
-        f.close()
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
             data=cat_id_content,
             headers={'Content-Type': 'application/soap+xml; charset=utf-8'}
         )
-    except:
-        print("Network Error!")
+    except requests.exceptions.RequestException as e:
+        print(f"Network Error: {e}")
         break
     doc = minidom.parseString(html.unescape(out.text))
     filenames = {}
@@ -147,21 +146,19 @@ for user in users:
             elif version.parse(wsa_build_ver) < version.parse(tmp_wsa_build_ver):
                 wsa_build_ver = tmp_wsa_build_ver
      
-print(f"Current version: {currentver}")
-print(f"New version: {wsa_build_ver}")
-# Check new WSA version
-if version.parse(currentver) < version.parse(wsa_build_ver):
-    print("New version found: " + wsa_build_ver)
-    new_version_found = True
-    # Write appversion content
-    subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
-    file.seek(0)
-    file.truncate()
-    file.write(wsa_build_ver)
-    # Write Github Environment
-    msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
-    with open(env_file, "a") as wr:
-        wr.write(f"SHOULD_BUILD=yes\n")
-        wr.write(f"RELEASE_TYPE=" + release_type + "\n")
-        wr.write(f"MSG=" + msg + "\n")
-file.close()
+    print(f"Current version: {currentver}")
+    print(f"New version: {wsa_build_ver}")
+    # Check new WSA version
+    if version.parse(currentver) < version.parse(wsa_build_ver):
+        print(f"New version found: {wsa_build_ver}")
+        new_version_found = True
+        # Write appversion content
+        subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
+        with open(f'{release_type}.appversion', 'w') as file:
+            file.write(wsa_build_ver)
+        # Write Github Environment
+        msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
+        with open(env_file, "a") as wr:
+            wr.write(f"SHOULD_BUILD=yes\n")
+            wr.write(f"RELEASE_TYPE={release_type}\n")
+            wr.write(f"MSG={msg}\n")
