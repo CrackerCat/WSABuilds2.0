@@ -46,72 +46,43 @@ git = (
     "git checkout -f update || git switch --discard-changes --orphan update"
 )
 
-# Get user_code (Thanks to @bubbles-wow because of his repository)
-users = {""}
-try:
-    response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
-    if response.status_code == 200:
-        content = response.json()["content"]
-        content = content.encode("utf-8")
-        content = base64.b64decode(content)
-        text = content.decode("utf-8")
-        user_code = Prop(text).get("user_code")
-        updatetime = Prop(text).get("update_time")
-        print("Successfully get user token from server!")
-        print(f"Last update time: {updatetime}\n")
-    else:
-        user_code = ""
-        print(f"Failed to get user token from server! Error code: {response.status_code}\n")
-except requests.exceptions.RequestException as e:
-    user_code = ""
-    print(f"Failed to get user token from server! Error: {e}\n")
-
-if user_code == "":
-    users = {""}
-else:
-    users = {"", user_code}
-
-for user in users:
-    if user == "":
-        print("Checking WSA Stable version...\n")
-        release_type = "retail"
-    else:
-        print("Checking WSA Insider version...\n")
-        release_type = "WIF"
-
-    currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/{release_type}.appversion").text.replace('\n', '')
+def WSAChecker(user, release_type):
+    global new_version_found
+    currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/" + release_type + ".appversion").text.replace('\n', '')
 
     # Write for pushing later
-    with open(f'{release_type}.appversion', 'w') as file:
-        file.write(currentver)
+    file = open('../' + release_type + '.appversion', 'w')
+    file.write(currentver)
 
     if new_version_found:
-        break
+        return 0;
     # Get information
-    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/GetCookie.xml", "r") as f:
+    with open("../xml/GetCookie.xml", "r") as f:
         cookie_content = f.read().format(user)
+        f.close()
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
             data=cookie_content,
             headers={'Content-Type': 'application/soap+xml; charset=utf-8'}
         )
-    except requests.exceptions.RequestException as e:
-        print(f"Network Error: {e}")
-        break
+    except:
+        print("Network Error!")
+        return 1
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
-    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
+    with open("../xml/WUIDRequest.xml", "r") as f:
         cat_id_content = f.read().format(user, cookie, cat_id, release_type)
+        f.close()
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
             data=cat_id_content,
             headers={'Content-Type': 'application/soap+xml; charset=utf-8'}
         )
-    except requests.exceptions.RequestException as e:
-        print(f"Network Error: {e}")
-        break
+    except:
+        print("Network Error!")
+        return 1
     doc = minidom.parseString(html.unescape(out.text))
     filenames = {}
     for node in doc.getElementsByTagName('ExtendedUpdateInfo')[0].getElementsByTagName('Updates')[0].getElementsByTagName('Update'):
@@ -146,19 +117,50 @@ for user in users:
             elif version.parse(wsa_build_ver) < version.parse(tmp_wsa_build_ver):
                 wsa_build_ver = tmp_wsa_build_ver
      
-    print(f"Current version: {currentver}")
-    print(f"New version: {wsa_build_ver}")
     # Check new WSA version
     if version.parse(currentver) < version.parse(wsa_build_ver):
-        print(f"New version found: {wsa_build_ver}")
+        print("New version found: " + wsa_build_ver)
         new_version_found = True
         # Write appversion content
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
-        with open(f'{release_type}.appversion', 'w') as file:
-            file.write(wsa_build_ver)
+        file.seek(0)
+        file.truncate()
+        file.write(wsa_build_ver)
         # Write Github Environment
-        msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
+        msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
         with open(env_file, "a") as wr:
-            wr.write(f"SHOULD_BUILD=yes\n")
-            wr.write(f"RELEASE_TYPE={release_type}\n")
-            wr.write(f"MSG={msg}\n")
+            wr.write("SHOULD_BUILD=yes\nRELEASE_TYPE=" + release_type + "\nMSG=" + msg)
+    file.close()
+
+# Get user_code (Thanks to @bubbles-wow because of his repository)
+users = {""}
+try:
+    response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
+    if response.status_code == 200:
+        content = response.json()["content"]
+        content = content.encode("utf-8")
+        content = base64.b64decode(content)
+        text = content.decode("utf-8")
+        user_code = Prop(text).get("user_code")
+        updatetime = Prop(text).get("update_time")
+        print("Successfully get user token from server!")
+        print(f"Last update time: {updatetime}\n")
+    else:
+        user_code = ""
+        print(f"Failed to get user token from server! Error code: {response.status_code}\n")
+except:
+    user_code = ""
+
+if user_code == "":
+    users = {""}
+else:
+    users = {"", user_code}
+for user in users:
+    if user == "":
+        print("Checking WSA Stable version...\n")
+        if WSAChecker(user, "retail") == 1:
+            break
+    else:
+        print("Checking WSA Insider version...\n")
+        if WSAChecker(user, "WIF") == 1:
+            break
