@@ -147,19 +147,22 @@ for user in users:
             elif version.parse(wsa_build_ver) < version.parse(tmp_wsa_build_ver):
                 wsa_build_ver = tmp_wsa_build_ver
      
-    # Check new WSA version
-    if version.parse(currentver) < version.parse(wsa_build_ver):
-        print("New version found: " + wsa_build_ver)
-        new_version_found = True
-        # Write appversion content
-        subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
-        file.seek(0)
-        file.truncate()
-        file.write(wsa_build_ver)
-        # Write Github Environment
-        msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
-        with open(env_file, "a") as wr:
-            wr.write(f"SHOULD_BUILD=yes\n")
-            wr.write(f"RELEASE_TYPE=" + release_type + "\n")
-            wr.write(f"MSG=" + msg + "\n")
-    file.close()
+print(f"Current version: {currentver}")
+print(f"New version: {wsa_build_ver}")
+
+# Check new WSA version
+if version.parse(currentver) < version.parse(wsa_build_ver):
+    print("New version found: " + wsa_build_ver)
+    new_version_found = True
+    # Write appversion content
+    subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
+    file.seek(0)
+    file.truncate()
+    file.write(wsa_build_ver)
+    # Write Github Environment
+    msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
+    with open(env_file, "a") as wr:
+        wr.write(f"SHOULD_BUILD=yes\n")
+        wr.write(f"RELEASE_TYPE=" + release_type + "\n")
+        wr.write(f"MSG=" + msg + "\n")
+file.close()
