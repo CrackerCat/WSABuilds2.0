@@ -149,7 +149,6 @@ for user in users:
      
 print(f"Current version: {currentver}")
 print(f"New version: {wsa_build_ver}")
-
 # Check new WSA version
 if version.parse(currentver) < version.parse(wsa_build_ver):
     print("New version found: " + wsa_build_ver)
