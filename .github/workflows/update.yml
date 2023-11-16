@@ -21,7 +21,7 @@ jobs:
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
             python3 WSAInsiderUpdateCheck.py
 
-      - name: Check WSA Retail Version ✅
+      - name: Check WSA Retail Version ☑️
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
             python3 WSARetailUpdateCheck.py
@@ -31,7 +31,7 @@ jobs:
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskStableUpdateCheck.py
             python3 MagiskStableUpdateCheck.py
 
-      - name: Check Magisk Canary Version ✅
+      - name: Check Magisk Canary Version ☑️
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskCanaryUpdateCheck.py
             python3 MagiskCanaryUpdateCheck.py
@@ -41,7 +41,7 @@ jobs:
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/KernelSUUpdateCheck.py
             python3 KernelSUUpdateCheck.py
 
-      - name: Check MindTheGapps Version ✅
+      - name: Check MindTheGapps Version ☑️
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MTGUpdateCheck.py
             python3 MTGUpdateCheck.py
