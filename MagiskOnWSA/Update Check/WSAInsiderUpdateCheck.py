@@ -35,6 +35,8 @@ env_file = os.getenv('GITHUB_ENV')
 #Category ID
 cat_id = '858014f3-3934-4abe-8078-4aa193e74ca8'
 
+release_type = "WIF"
+
 new_version_found = False
 
 session = Session()
@@ -86,7 +88,7 @@ if not new_version_found:
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
     with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
-        cat_id_content = f.read().format(user_code, cookie, cat_id, WIF)
+        cat_id_content = f.read().format(user, cookie, cat_id, release_type)
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
