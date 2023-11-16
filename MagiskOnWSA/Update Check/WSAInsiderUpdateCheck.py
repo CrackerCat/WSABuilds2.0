@@ -73,8 +73,9 @@ users = {"", user_code}
 # The code inside the function WSAInsiderUpdateChecker starts here
 currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/WIF.appversion").text.replace('\n', '')
 
-with open('WIF.appversion', 'w') as file:
-  file.write(currentver)
+# Write for pushing later
+file = open('WIF.appversion', 'w')
+file.write(currentver)
 
 if not new_version_found:
     # Get information
@@ -136,7 +137,10 @@ if not new_version_found:
             elif parse_version(wsa_build_ver) < parse_version(tmp_wsa_build_ver):
                 wsa_build_ver = tmp_wsa_build_ver
 
-if parse_version(currentver) < parse_version(wsa_build_ver):
+    print(f"{wsa_build_ver}")
+    print(f"{currentver}")
+
+    if parse_version(currentver) < parse_version(wsa_build_ver):
         print(f"New version found: {wsa_build_ver}")
         new_version_found = True
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
@@ -147,4 +151,4 @@ if parse_version(currentver) < parse_version(wsa_build_ver):
             wr.write(f"SHOULD_BUILD=yes\n")
             wr.write(f"RELEASE_TYPE={release_type}\n")
             wr.write(f"MSG={msg}\n")
-            file.close()
+    file.close()
