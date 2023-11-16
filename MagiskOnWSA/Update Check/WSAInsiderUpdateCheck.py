@@ -73,9 +73,8 @@ users = {"", user_code}
 # The code inside the function WSAInsiderUpdateChecker starts here
 currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/WIF.appversion").text.replace('\n', '')
 
-# Write for pushing later
-file = open('WIF.appversion', 'w')
-file.write(currentver)
+with open('WIF.appversion', 'w') as file:
+  file.write(currentver)
 
 if not new_version_found:
     # Get information
