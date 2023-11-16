@@ -136,7 +136,7 @@ if not new_version_found:
             elif parse_version(wsa_build_ver) < parse_version(tmp_wsa_build_ver):
                 wsa_build_ver = tmp_wsa_build_ver
 
-    if currentver != wsa_build_ver:
+if parse_version(currentver) < parse_version(wsa_build_ver):
         print(f"New version found: {wsa_build_ver}")
         new_version_found = True
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
@@ -147,4 +147,4 @@ if not new_version_found:
             wr.write(f"SHOULD_BUILD=yes\n")
             wr.write(f"RELEASE_TYPE={release_type}\n")
             wr.write(f"MSG={msg}\n")
-    file.close()
+            file.close()
