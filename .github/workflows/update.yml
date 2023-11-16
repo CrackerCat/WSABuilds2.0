@@ -16,27 +16,27 @@ jobs:
         run: |
           pip3 install beautifulsoup4 lxml
 
-      - name: Get WSA Version ✅
+      - name: Check WSA Insider Version ✅
         run: |
-            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAUpdateCheck.py
-            python3 WSAUpdateCheck.py
+            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
+            python3 WSAInsiderUpdateCheck.py
 
-      - name: Get Magisk Stable Version ✅
+      - name: Check Magisk Stable Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskStableUpdateCheck.py
             python3 MagiskStableUpdateCheck.py
 
-      - name: Get Magisk Canary Version ✅
+      - name: Check Magisk Canary Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskCanaryUpdateCheck.py
             python3 MagiskCanaryUpdateCheck.py
 
-      - name: Get KernelSU Version ✅
+      - name: Check KernelSU Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/KernelSUUpdateCheck.py
             python3 KernelSUUpdateCheck.py
 
-      - name: Get MindTheGapps Version ✅
+      - name: Check MindTheGapps Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MTGUpdateCheck.py
             python3 MTGUpdateCheck.py
