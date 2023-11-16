@@ -44,7 +44,6 @@ git = (
     "git checkout -f update || git switch --discard-changes --orphan update"
 )
 
-users = {"", user_code}
 try:
     response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
     if response.status_code == 200:
@@ -61,6 +60,8 @@ try:
         print(f"Failed to get user token from server! Error code: {response.status_code}\n")
 except:
     user_code = ""
+
+users = {"", user_code}
 
 # The code inside the function WSAInsiderUpdateChecker starts here
 currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/WIF.appversion").text.replace('\n', '')
