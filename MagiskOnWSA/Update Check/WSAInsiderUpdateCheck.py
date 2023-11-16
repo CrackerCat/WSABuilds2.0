@@ -66,7 +66,7 @@ except:
 users = {"", user_code}
 
 # The code inside the function WSAInsiderUpdateChecker starts here
-currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/WIF.appversion").text.replace('\n', '')
+currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/WIF.appversion").text.replace('\n', '')
 
 # Write for pushing later
 file = open('WIF.appversion', 'w')
