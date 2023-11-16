@@ -35,8 +35,6 @@ env_file = os.getenv('GITHUB_ENV')
 #Category ID
 cat_id = '858014f3-3934-4abe-8078-4aa193e74ca8'
 
-release_type = "WIF"
-
 new_version_found = False
 
 session = Session()
@@ -46,20 +44,35 @@ git = (
     "git checkout -f update || git switch --discard-changes --orphan update"
 )
 
-def WSAChecker(user, release_type):
-    global new_version_found
-    currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/" + release_type + ".appversion").text.replace('\n', '')
+users = {"", user_code}
+try:
+    response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
+    if response.status_code == 200:
+        content = response.json()["content"]
+        content = content.encode("utf-8")
+        content = base64.b64decode(content)
+        text = content.decode("utf-8")
+        user_code = Prop(text).get("user_code")
+        updatetime = Prop(text).get("update_time")
+        print("Successfully get user token from server!")
+        print(f"Last update time: {updatetime}\n")
+    else:
+        user_code = ""
+        print(f"Failed to get user token from server! Error code: {response.status_code}\n")
+except:
+    user_code = ""
 
-    # Write for pushing later
-    file = open('../' + release_type + '.appversion', 'w')
-    file.write(currentver)
+# The code inside the function WSAInsiderUpdateChecker starts here
+currentver = requests.get(f"https://raw.githubusercontent.com/YT-Advanced/WSA-Script/update/WIF.appversion").text.replace('\n', '')
 
-    if new_version_found:
-        return 0;
+# Write for pushing later
+file = open('../WIF.appversion', 'w')
+file.write(currentver)
+
+if not new_version_found:
     # Get information
     with open("../xml/GetCookie.xml", "r") as f:
-        cookie_content = f.read().format(user)
-        f.close()
+        cookie_content = f.read().format(user_code)
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
@@ -68,12 +81,11 @@ def WSAChecker(user, release_type):
         )
     except:
         print("Network Error!")
-        return 1
+        exit(1)
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
     with open("../xml/WUIDRequest.xml", "r") as f:
-        cat_id_content = f.read().format(user, cookie, cat_id, release_type)
-        f.close()
+        cat_id_content = f.read().format(user_code, cookie, cat_id, WIF)
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
@@ -82,7 +94,7 @@ def WSAChecker(user, release_type):
         )
     except:
         print("Network Error!")
-        return 1
+        exit(1)
     doc = minidom.parseString(html.unescape(out.text))
     filenames = {}
     for node in doc.getElementsByTagName('ExtendedUpdateInfo')[0].getElementsByTagName('Updates')[0].getElementsByTagName('Update'):
@@ -129,38 +141,5 @@ def WSAChecker(user, release_type):
         # Write Github Environment
         msg = 'Update WSA Version from `v' + currentver + '` to `v' + wsa_build_ver + '`'
         with open(env_file, "a") as wr:
-            wr.write("SHOULD_BUILD=yes\nRELEASE_TYPE=" + release_type + "\nMSG=" + msg)
+            wr.write("SHOULD_BUILD=yes\nRELEASE_TYPE=WIF\nMSG=" + msg)
     file.close()
-
-# Get user_code (Thanks to @bubbles-wow because of his repository)
-users = {""}
-try:
-    response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
-    if response.status_code == 200:
-        content = response.json()["content"]
-        content = content.encode("utf-8")
-        content = base64.b64decode(content)
-        text = content.decode("utf-8")
-        user_code = Prop(text).get("user_code")
-        updatetime = Prop(text).get("update_time")
-        print("Successfully get user token from server!")
-        print(f"Last update time: {updatetime}\n")
-    else:
-        user_code = ""
-        print(f"Failed to get user token from server! Error code: {response.status_code}\n")
-except:
-    user_code = ""
-
-if user_code == "":
-    users = {""}
-else:
-    users = {"", user_code}
-for user in users:
-    if user == "":
-        print("Checking WSA Stable version...\n")
-        if WSAChecker(user, "retail") == 1:
-            break
-    else:
-        print("Checking WSA Insider version...\n")
-        if WSAChecker(user, "WIF") == 1:
-            break
