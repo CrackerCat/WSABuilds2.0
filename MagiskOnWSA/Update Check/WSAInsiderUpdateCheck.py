@@ -72,7 +72,7 @@ file.write(currentver)
 
 if not new_version_found:
     # Get information
-    with open("../xml/GetCookie.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/GetCookie.xml", "r") as f:
         cookie_content = f.read().format(user_code)
     try:
         out = session.post(
@@ -85,7 +85,7 @@ if not new_version_found:
         exit(1)
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
-    with open("../xml/WUIDRequest.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
         cat_id_content = f.read().format(user_code, cookie, cat_id, WIF)
     try:
         out = session.post(
