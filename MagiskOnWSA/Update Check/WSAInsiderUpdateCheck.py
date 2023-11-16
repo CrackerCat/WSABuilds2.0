@@ -88,7 +88,7 @@ if not new_version_found:
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
     with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
-        cat_id_content = f.read().format(user, cookie, cat_id, release_type)
+        cat_id_content = f.read().format(user_code, cookie, cat_id, release_type)
     try:
         out = session.post(
             'https://fe3.delivery.mp.microsoft.com/ClientWebService/client.asmx',
