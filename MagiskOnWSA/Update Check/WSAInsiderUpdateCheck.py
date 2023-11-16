@@ -46,6 +46,9 @@ git = (
     "git checkout -f update || git switch --discard-changes --orphan update"
 )
 
+def parse_version(version_str):
+    return tuple(map(int, version_str.split('.')))
+
 try:
     response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
     if response.status_code == 200:
@@ -129,10 +132,10 @@ if not new_version_found:
             tmp_wsa_build_ver = re.search(r"\d{4}.\d{5}.\d{1,}.\d{1,}", filename).group()
             if (wsa_build_ver == 0):
                 wsa_build_ver = tmp_wsa_build_ver
-            elif version.parse(wsa_build_ver) < version.parse(tmp_wsa_build_ver):
+            elif parse_version(wsa_build_ver) < parse_version(tmp_wsa_build_ver):
                 wsa_build_ver = tmp_wsa_build_ver
-     
-    if version.parse(currentver) < version.parse(wsa_build_ver):
+
+    if parse_version(currentver) < parse_version(wsa_build_ver):
         print(f"New version found: {wsa_build_ver}")
         new_version_found = True
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
