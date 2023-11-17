@@ -288,3 +288,20 @@ jobs:
         env:
           GITHUB_WORKSPACE: ${{ github.workspace }}
 
+  build1:
+    name: Build 1 with x64, No Root, MindTheGapps, No Amazon Appstore and Pixel 5 Device Model 🏗️
+    permissions: write-all
+    needs: [check-and-create-tag]
+    uses: ./.github/workflows/Build_For_x64.yml
+    if: needs.check.outputs.SHOULD_BUILD == 'yes'
+    with:
+      arch: x64
+      root: none
+      gapps: MindTheGapps
+      amazonflag: --remove-amazon
+      magiskver: stable
+      devicemodel: redfin
+      compressformat: zip
+      release_type: ${{ needs.check.outputs.RELEASE_TYPE }}
+    secrets: inherit
+
