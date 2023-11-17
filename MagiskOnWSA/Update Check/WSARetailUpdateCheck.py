@@ -49,12 +49,7 @@ git = (
 user_code = ""
 users = {""}
 
-response = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/retail.appversion")
-if response.status_code == 200:
-    currentver = response.text.replace('\n', '')
-else:
-    print(f"Failed to fetch version: HTTP {response.status_code}")
-    currentver = ""
+currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/retail.appversion").text.replace('\n', '')
 
 # Write for pushing later
 file = open('retail.appversion', 'w')
