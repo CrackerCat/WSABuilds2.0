@@ -36,11 +36,6 @@ jobs:
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskCanaryUpdateCheck.py
             python3 MagiskCanaryUpdateCheck.py
 
-      - name: Check Magisk Alpha Version ✅
-        run: |
-            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskCanaryUpdateCheck.py
-            python3 MagiskCanaryUpdateCheck.py
-
       - name: Check KernelSU Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/KernelSUUpdateCheck.py
