@@ -1,0 +1,32 @@
+name: Create Update Branch
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Check update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ♻️
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies 🧑‍🏭
+        run: |
+          pip3 install beautifulsoup4 lxml
+
+      - name: Create branch if not found 🏗️
+        run: |
+          git checkout -f update || git switch --discard-changes --orphan update
+
+      - name: Create .appversion files 📝
+        run: |
+          touch retail.appversion WIF.appversion gapps.appversion kernelsu.appversion magiskcanary.appversion magiskstable.appversion
+
+      - name: Commit new .appversion files 🔗
+        uses: stefanzweifel/git-auto-commit-action@v5.0.0
+        with:
+          branch: update
+          push_options: '--force'
+          file_pattern: '*.appversion'
+          commit_message: ${{ 'Create App Version files' }}
+          create_branch: true
