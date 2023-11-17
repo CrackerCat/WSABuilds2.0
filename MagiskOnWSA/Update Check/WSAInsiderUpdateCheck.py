@@ -65,8 +65,12 @@ except:
 
 users = {"", user_code}
 
-# The code inside the function WSAInsiderUpdateChecker starts here
-currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/WIF.appversion").text.replace('\n', '')
+response = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/WIF.appversion")
+if response.status_code == 200:
+    currentver = response.text.replace('\n', '')
+else:
+    print(f"Failed to fetch version: HTTP {response.status_code}")
+    currentver = ""
 
 # Write for pushing later
 file = open('WIF.appversion', 'w')
