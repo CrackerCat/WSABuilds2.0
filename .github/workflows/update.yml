@@ -86,7 +86,8 @@ jobs:
       MAGISK_CANARY_MSG: ${{ env.MAGISK_CANARY_MSG }}
       MAGISK_STABLE_MSG: ${{ env.MAGISK_STABLE_MSG }}
       KERNEL_SU_MSG: ${{ env.KERNEL_SU_MSG }}
-      WSA_VER: ${{ env.LATEST_WSA_VER }}
+      LATEST_WIF_VER: ${{ env.WSA_INSIDER_VER }}
+      LATEST_RETAIL_VER: ${{ env.WSA_RETAIL_VER }}
       MTG_MSG: ${{ env.MTG_MSG }}
       
   check-and-create-tag:
@@ -103,9 +104,9 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ needs.check.outputs.RELEASE_TYPE }}" == "WIF" ]]; then
-            currentver=${{ needs.check.outputs.WSA_VER }}
-          else
-            currentver=${{ needs.check.outputs.WSA_VER }}
+            currentver=${{ needs.check.outputs.LATEST_WIF_VER }}
+          elif [[ "${{ needs.check.outputs.RELEASE_TYPE }}" == "retail" ]]; then
+            currentver=${{ needs.check.outputs.LATEST_RETAIL_VER }}
           fi
           if [[ -z "$currentver" ]]; then
               echo "currentver is empty. Please check the file contents."
