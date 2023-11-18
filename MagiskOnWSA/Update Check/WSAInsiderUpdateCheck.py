@@ -46,6 +46,11 @@ git = (
     "git checkout -f update || git switch --discard-changes --orphan update"
 )
 
+import os
+
+print("Current working directory:", os.getcwd())
+print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml'))
+
 try:
     response = requests.get("https://api.github.com/repos/bubbles-wow/MS-Account-Token/contents/token.cfg")
     if response.status_code == 200:
