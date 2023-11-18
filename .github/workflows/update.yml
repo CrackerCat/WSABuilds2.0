@@ -25,6 +25,7 @@ jobs:
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
             python3 WSARetailUpdateCheck.py
+        if: env.INSIDER_UPDATE != 'yes'
 
       - name: Check Magisk Stable Version ✅
         run: |
@@ -51,13 +52,16 @@ jobs:
             echo ${{ env.SHOULD_BUILD }}
             echo ${{ env.RELEASE_TYPE }}
             echo ${{ env.MSG }}
+            echo ${{ env.LATEST_WIF_VER }}
+            echo ${{ env.LATEST_RETAIL_VER }}
+            echo ${{ env.INSIDER_UPDATE }}
+            echo ${{ env.RETAIL_UPDATE }}
             echo ${{ env.MAGISK_CANARY_MSG }}
             echo ${{ env.MAGISK_STABLE_MSG }}
             echo ${{ env.KERNEL_SU_MSG }}
-            echo ${{ env.LATEST_WIF_VER }}
-            echo ${{ env.LATEST_RETAIL_VER }}
-            echo ${{ env.MTG_MSG }}    
-             
+            echo ${{ env.MTG_MSG }}   
+
+                   
       - name: Update App version 🔗
         uses: stefanzweifel/git-auto-commit-action@v5.0.0
         with:
