@@ -34,10 +34,10 @@ jobs:
           check-latest: true
           python-version: '3.x'
           cache: 'pip'
-          cache-dependency-path: scripts
+          cache-dependency-path: MagiskOnWSA/script
 
       - name: Setup Python3 Virtual Enviroment 🐍
-        working-directory: scripts
+        working-directory: MagiskOnWSA/scripts
         run: |
           sudo apt-get update
           PYTHON_VENV_DIR="$(dirname "$PWD")/python3-env"
