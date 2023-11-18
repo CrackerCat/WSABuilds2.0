@@ -49,14 +49,14 @@ git = (
 user_code = ""
 users = {""}
 
+print("Current working directory:", os.getcwd())
+print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml'))
+
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/retail.appversion").text.replace('\n', '')
 
 # Write for pushing later
 file = open('retail.appversion', 'w')
 file.write(currentver)
-
-print("Current working directory:", os.getcwd())
-print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml'))
 
 if not new_version_found:
     # Get information
