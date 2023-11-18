@@ -129,5 +129,5 @@ if not new_version_found:
             wr.write(f"SHOULD_BUILD=yes\n")
             wr.write(f"RELEASE_TYPE={release_type}\n")
             wr.write(f"MSG={msg}\n")
-            wr.write(f"WSA_RETAIL_VER={wsa_build_ver}\n")
+            wr.write(f"RETAIL_UPDATE=yes\n")
     file.close()
