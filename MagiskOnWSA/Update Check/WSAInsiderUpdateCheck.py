@@ -69,10 +69,16 @@ users = {"", user_code}
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/WIF.appversion").text.replace('\n', '')
 
 # Write for pushing later
-file = open('WIF.appversion', 'w')
-file.write(currentver)
-
+try:
+    # Write for pushing later
+    file = open('WIF.appversion', 'w')
+    file.write(currentver)
+    file.close()
+    print("WIF.appversion file created successfully.")
+except Exception as e:
+    print(f"Error writing to file: {e}")
 print("Current working directory:", os.getcwd())
+
 print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml'))
 
 if not new_version_found:
@@ -139,8 +145,13 @@ if not new_version_found:
         print(f"New version found: {wsa_build_ver}")
         new_version_found = True
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
-        with open(f'WIF.appversion', 'w') as file:
-            file.write(wsa_build_ver)
+        try:
+            with open('WIF.appversion', 'w') as file:
+                file.write(wsa_build_ver)
+                file.close()
+            print("WIF.appversion file created successfully.")
+        except Exception as e:
+            print(f"Error writing to file: {e}")
         msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
         with open(env_file, "a") as wr:
             wr.write(f"SHOULD_BUILD=yes\n")
@@ -148,4 +159,3 @@ if not new_version_found:
             wr.write(f"MSG={msg}\n")
             wr.write(f"WSA_INSIDER_VER={wsa_build_ver}\n")
             wr.write(f"INSIDER_UPDATE=yes\n")
-    file.close()
