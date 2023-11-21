@@ -31,6 +31,9 @@ jobs:
             name: retail-appversion
             path: /home/runner/work/WSABuilds2.0/WSABuilds2.0/retail.appversion
 
+        - name: Checkout Again ♻️
+          uses: actions/checkout@v4
+
       outputs:
         SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
         RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
@@ -73,6 +76,9 @@ jobs:
           with:
             name: WIF-appversion
             path: /home/runner/work/WSABuilds2.0/WSABuilds2.0/WIF.appversion
+
+        - name: Checkout Again ♻️
+          uses: actions/checkout@v4
             
       outputs:
         SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
