@@ -60,7 +60,7 @@ try:
     file = open('retail.appversion', 'w')
     file.write(currentver)
     file.close()
-    print("WIF.appversion file created successfully.")
+    print("retail.appversion file created successfully.")
 except Exception as e:
     print(f"Error writing to file: {e}")
 
@@ -132,7 +132,7 @@ if not new_version_found:
             with open('retail.appversion', 'w') as file:
                 file.write(wsa_build_ver)
                 file.close()
-            print("WIF.appversion file created successfully.")
+            print("retail.appversion file created successfully.")
         except Exception as e:
             print(f"Error writing to file: {e}")
         msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
