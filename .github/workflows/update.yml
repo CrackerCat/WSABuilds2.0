@@ -26,13 +26,14 @@ jobs:
            python3 WSARetailUpdateCheck.py
 
         - name: Update App version 🔗
-          uses: stefanzweifel/git-auto-commit-action@v5.0.0
+          uses: ad-m/github-push-action@master
           with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
             branch: update
-            push_options: '--force'
-            file_pattern: '*.appversion'
+            force: true
+            directory: '.'
             commit_message: ${{ env.MSG || 'Update App Version' }}
-            create_branch: true   
+
        
   checkwsainsider:
       name: Check WSA Insider Version Update ✅
