@@ -55,7 +55,7 @@ print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':",
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/retail.appversion").text.replace('\n', '')
 
 # Write for pushing later
-file = open('retail.appversion', 'w')
+file = open('../retail.appversion', 'w')
 file.write(currentver)
 
 if not new_version_found:
@@ -122,7 +122,7 @@ if not new_version_found:
         print(f"New version found: {wsa_build_ver}")
         new_version_found = True
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
-        with open(f'retail.appversion', 'w') as file:
+        with open(f'../retail.appversion', 'w') as file:
             file.write(wsa_build_ver)
         msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
         with open(env_file, "a") as wr:
