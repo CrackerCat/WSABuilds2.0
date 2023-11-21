@@ -103,15 +103,6 @@ jobs:
         with:
           name: WIF-appversion   
 
-      - name: Check File Location
-        run: |
-            ls
-            
-      - name: Check File Location 2 
-        run: |
-            ls "/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/Update Check/"
-            ls "/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/"
-
       - name: Check Magisk Stable Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MagiskStableUpdateCheck.py
