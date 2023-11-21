@@ -29,7 +29,7 @@ jobs:
           uses: actions/upload-artifact@v2
           with:
             name: retail-appversion
-            path: retail.appversion
+            path: /home/runner/work/WSABuilds2.0/WSABuilds2.0/retail.appversion
 
       outputs:
         SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
@@ -64,7 +64,7 @@ jobs:
           uses: actions/upload-artifact@v2
           with:
             name: WIF-appversion
-            path: WIF.appversion
+            path: /home/runner/work/WSABuilds2.0/WSABuilds2.0/WIF.appversion
             
       outputs:
         SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
