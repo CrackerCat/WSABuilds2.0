@@ -9,6 +9,13 @@ jobs:
       name: Check WSA Retail Version Update ✅
       runs-on: ubuntu-latest
       steps:
+        - name: Checkout ♻️
+          uses: actions/checkout@v4
+
+        - name: Install Dependencies 🧑‍🏭
+          run: |
+            pip3 install beautifulsoup4 lxml
+      
         - name: Check Files and Folders
           run: |
            ls
