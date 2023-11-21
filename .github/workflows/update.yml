@@ -15,15 +15,15 @@ jobs:
         - name: Install Dependencies 🧑‍🏭
           run: |
             pip3 install beautifulsoup4 lxml
-      
-        - name: Check Files and Folders
-          run: |
-           ls
            
         - name: Compare Current and Latest Version
           run: |
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
            python3 WSARetailUpdateCheck.py
+
+        - name: Check Files and Folders
+          run: |
+           ls
 
         - name: Upload retail.appversion
           uses: actions/upload-artifact@v2
@@ -55,7 +55,11 @@ jobs:
           run: |
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
            python3 WSAInsiderUpdateCheck.py
-  
+
+        - name: Check File Location
+          run: |
+            ls
+            
         - name: Upload WIF.appversion
           uses: actions/upload-artifact@v2
           with:
