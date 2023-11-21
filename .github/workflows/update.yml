@@ -5,7 +5,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
+  checkwsaretail:
+      name: Check WSA Retail Version Update ✅
+      runs-on: ubuntu-latest
+      steps:
+        - name: Compare Current and Latest Version
+          run: |
+           wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
+           python3 WSARetailUpdateCheck.py
+
+        - name: Update App version 🔗
+          uses: stefanzweifel/git-auto-commit-action@v5.0.0
+          with:
+            branch: update
+            push_options: '--force'
+            file_pattern: '*.appversion'
+            commit_message: ${{ env.MSG || 'Update App Version' }}
+            create_branch: true   
+       
+  checkwsainsider:
+      name: Check WSA Insider Version Update ✅
+      runs-on: ubuntu-latest
+      steps:
+        - name: Compare Current and Latest Version
+          run: |
+           wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
+           python3 WSAInsiderUpdateCheck.py
+
+        - name: Update App version 🔗
+          uses: stefanzweifel/git-auto-commit-action@v5.0.0
+          with:
+            branch: update
+            push_options: '--force'
+            file_pattern: '*.appversion'
+            commit_message: ${{ env.MSG || 'Update App Version' }}
+            create_branch: true   
+
+  checkcomponents:
     name: Check updates for components
     runs-on: ubuntu-latest
     steps:
@@ -15,14 +51,6 @@ jobs:
       - name: Install Dependencies 🧑‍🏭
         run: |
           pip3 install beautifulsoup4 lxml
-
-      - name: Check WSA Insider Version ✅
-        run: |
-            python3 MagiskOnWSA/Update\ Check/WSAInsiderUpdateCheck.py
-
-      - name: Check WSA Retail Version ☑️
-        run: |
-            python3 MagiskOnWSA/Update\ Check/WSARetailUpdateCheck.py
 
       - name: Check Magisk Stable Version ✅
         run: |
