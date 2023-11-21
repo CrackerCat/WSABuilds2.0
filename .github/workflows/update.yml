@@ -19,6 +19,7 @@ jobs:
         - name: Check Files and Folders
           run: |
            ls
+           
         - name: Compare Current and Latest Version
           run: |
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
@@ -45,9 +46,12 @@ jobs:
           run: |
             pip3 install beautifulsoup4 lxml
       
-        - name: Compare Current and Latest Version
+        - name: Check Files and Folders
           run: |
            ls
+           
+        - name: Compare Current and Latest Version
+          run: |
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
            python3 WSAInsiderUpdateCheck.py
 
