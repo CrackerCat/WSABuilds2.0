@@ -25,14 +25,14 @@ jobs:
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
            python3 WSARetailUpdateCheck.py
 
-        - name: Update App version 🔗
+        - name: Commit and push changes
           uses: ad-m/github-push-action@master
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
-            branch: update
-            force: true
-            directory: '.'
-            commit_message: ${{ env.MSG || 'Update App Version' }}
+            commit_message: 'Update .appversion file'
+            author_email: 'action@github.com'
+            author_name: 'GitHub Action'
+
 
        
   checkwsainsider:
@@ -55,15 +55,15 @@ jobs:
           run: |
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
            python3 WSAInsiderUpdateCheck.py
-
-        - name: Update App version 🔗
-          uses: stefanzweifel/git-auto-commit-action@v5.0.0
+  
+        - name: Commit and push changes
+          uses: ad-m/github-push-action@master
           with:
-            branch: update
-            push_options: '--force'
-            file_pattern: '*.appversion'
-            commit_message: ${{ env.MSG || 'Update App Version' }}
-            create_branch: true   
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            commit_message: 'Update .appversion file'
+            author_email: 'action@github.com'
+            author_name: 'GitHub Action'
+
 
   checkcomponents:
     name: Check updates for components
