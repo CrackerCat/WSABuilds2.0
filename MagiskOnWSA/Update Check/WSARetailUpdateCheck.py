@@ -122,7 +122,7 @@ if not new_version_found:
         print(f"New version found: {wsa_build_ver}")
         new_version_found = True
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
-        with open(f'../retail.appversion', 'w') as file:
+        with open(f'retail.appversion', 'w') as file:
             file.write(wsa_build_ver)
         msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
         with open(env_file, "a") as wr:
