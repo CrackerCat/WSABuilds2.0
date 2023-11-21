@@ -68,6 +68,9 @@ users = {"", user_code}
 # The code inside the function WSAInsiderUpdateChecker starts here
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/WIF.appversion").text.replace('\n', '')
 
+print("Current working directory:", os.getcwd())
+print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml'))
+
 # Write for pushing later
 try:
     # Write for pushing later
@@ -77,9 +80,6 @@ try:
     print("WIF.appversion file created successfully.")
 except Exception as e:
     print(f"Error writing to file: {e}")
-print("Current working directory:", os.getcwd())
-
-print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml'))
 
 if not new_version_found:
     # Get information
