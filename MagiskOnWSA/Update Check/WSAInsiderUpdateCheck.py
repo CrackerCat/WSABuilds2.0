@@ -69,7 +69,7 @@ users = {"", user_code}
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/WIF.appversion").text.replace('\n', '')
 
 # Write for pushing later
-file = open('../WIF.appversion', 'w')
+file = open('WIF.appversion', 'w')
 file.write(currentver)
 
 print("Current working directory:", os.getcwd())
