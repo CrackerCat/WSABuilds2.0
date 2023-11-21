@@ -121,7 +121,7 @@ jobs:
       
   check-and-create-tag:
     name: Creates the release tags
-    needs: [check]
+    needs: [checkcomponents, checkwsainsider, checkwsaretail]
     if: needs.check.outputs.SHOULD_BUILD == 'yes'
     runs-on: ubuntu-latest
     steps:
@@ -320,7 +320,7 @@ jobs:
   build1:
     name: Build 1 with x64, No Root, MindTheGapps, No Amazon Appstore and Pixel 5 Device Model 🏗️
     permissions: write-all
-    needs: [check-and-create-tag]
+    needs: [checkcomponents, checkwsainsider, checkwsaretail, check-and-create-tag]
     uses: ./.github/workflows/Build_For_x64.yml
     if: needs.check.outputs.SHOULD_BUILD == 'yes'
     with:
