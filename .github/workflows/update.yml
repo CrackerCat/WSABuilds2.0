@@ -25,15 +25,19 @@ jobs:
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
            python3 WSARetailUpdateCheck.py
 
-        - name: Commit and push changes
-          uses: ad-m/github-push-action@master
+        - name: Upload retail.appversion
+          uses: actions/upload-artifact@v2
           with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            commit_message: 'Update .appversion file'
-            author_email: 'action@github.com'
-            author_name: 'GitHub Action'
+            name: retail-appversion
+            path: retail.appversion
 
-
+      outputs:
+        SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
+        RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
+        WSA_UPDATE_MESSAGE: ${{ env.MSG }}
+        LATEST_RETAIL_VER: ${{ env.WSA_RETAIL_VER }}
+        RETAIL_UPDATE: echo ${{ env.RETAIL_UPDATE }}
+      
        
   checkwsainsider:
       name: Check WSA Insider Version Update ✅
@@ -56,14 +60,18 @@ jobs:
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
            python3 WSAInsiderUpdateCheck.py
   
-        - name: Commit and push changes
-          uses: ad-m/github-push-action@master
+        - name: Upload retail.appversion
+          uses: actions/upload-artifact@v2
           with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            commit_message: 'Update .appversion file'
-            author_email: 'action@github.com'
-            author_name: 'GitHub Action'
-
+            name: WIF-appversion
+            path: WIF.appversion
+            
+      outputs:
+        SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
+        RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
+        WSA_UPDATE_MESSAGE: ${{ env.MSG }}
+        LATEST_WIF_VER: ${{ env.WSA_INSIDER_VER }}
+        INSIDER_UPDATE: echo ${{ env.INSIDER_UPDATE }}
 
   checkcomponents:
     name: Check updates for components
@@ -76,6 +84,16 @@ jobs:
       - name: Install Dependencies 🧑‍🏭
         run: |
           pip3 install beautifulsoup4 lxml
+
+      - name: Download retail.appversion
+        uses: actions/download-artifact@v2
+        with:
+          name: retail-appversion
+
+      - name: Download retail.appversion
+        uses: actions/download-artifact@v2
+        with:
+          name: WIF-appversion   
 
       - name: Check Magisk Stable Version ✅
         run: |
@@ -99,13 +117,13 @@ jobs:
 
       - name: Check GitHub ENVs
         run: |
-            echo ${{ env.SHOULD_BUILD }}
-            echo ${{ env.RELEASE_TYPE }}
-            echo ${{ env.MSG }}
-            echo ${{ env.LATEST_WIF_VER }}
-            echo ${{ env.LATEST_RETAIL_VER }}
-            echo ${{ env.INSIDER_UPDATE }}
-            echo ${{ env.RETAIL_UPDATE }}
+            echo ${{ needs.check.outputs.SHOULD_BUILD }}
+            echo ${{ needs.check.outputs.RELEASE_TYPE }}
+            echo ${{ needs.check.outputs.WSA_UPDATE_MESSAGE }}
+            echo ${{ needs.check.outputs.LATEST_WIF_VER }}
+            echo ${{ needs.check.outputs.LATEST_RETAIL_VER }}
+            echo ${{ needs.check.outputs.INSIDER_UPDATE }}
+            echo ${{ needs.check.outputs.RETAIL_UPDATE }}
             echo ${{ env.MAGISK_CANARY_MSG }}
             echo ${{ env.MAGISK_STABLE_MSG }}
             echo ${{ env.KERNEL_SU_MSG }}
@@ -118,7 +136,7 @@ jobs:
           branch: update
           push_options: '--force'
           file_pattern: '*.appversion'
-          commit_message: ${{ env.MSG || 'Update App Version' }}
+          commit_message: ${{ needs.check.outputs.WSA_UPDATE_MESSAGE || 'Update App Version' }}
           create_branch: true
           
       - name: Delete old workflow run ❌
@@ -134,14 +152,9 @@ jobs:
         uses: actions/checkout@v4.1.1
       
     outputs:
-      SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
-      RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
-      WSA_UPDATE_MESSAGE: ${{ env.MSG }}
       MAGISK_CANARY_MSG: ${{ env.MAGISK_CANARY_MSG }}
       MAGISK_STABLE_MSG: ${{ env.MAGISK_STABLE_MSG }}
       KERNEL_SU_MSG: ${{ env.KERNEL_SU_MSG }}
-      LATEST_WIF_VER: ${{ env.WSA_INSIDER_VER }}
-      LATEST_RETAIL_VER: ${{ env.WSA_RETAIL_VER }}
       MTG_MSG: ${{ env.MTG_MSG }}
       
   check-and-create-tag:
