@@ -57,7 +57,7 @@ currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABui
 # Write for pushing later
 try:
     # Write for pushing later
-    file = open('WIF.appversion', 'w')
+    file = open('retail.appversion', 'w')
     file.write(currentver)
     file.close()
     print("WIF.appversion file created successfully.")
@@ -129,7 +129,7 @@ if not new_version_found:
         new_version_found = True
         subprocess.Popen(git, shell=True, stdout=None, stderr=None, executable='/bin/bash').wait()
         try:
-            with open('WIF.appversion', 'w') as file:
+            with open('retail.appversion', 'w') as file:
                 file.write(wsa_build_ver)
                 file.close()
             print("WIF.appversion file created successfully.")
