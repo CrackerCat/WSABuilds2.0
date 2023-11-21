@@ -11,6 +11,7 @@ jobs:
       steps:
         - name: Compare Current and Latest Version
           run: |
+           ls
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
            python3 WSARetailUpdateCheck.py
 
@@ -29,6 +30,7 @@ jobs:
       steps:
         - name: Compare Current and Latest Version
           run: |
+           ls
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
            python3 WSAInsiderUpdateCheck.py
 
