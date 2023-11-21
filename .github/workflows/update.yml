@@ -56,9 +56,17 @@ jobs:
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
            python3 WSAInsiderUpdateCheck.py
 
-        - name: Check File Location
+        - name: Check Files and Folders 1
           run: |
-            ls
+           ls
+        
+        - name: Check Files and Folders 2
+          run: |
+           ls "/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA"
+
+        - name: Check Files and Folders 3
+          run: |
+           ls "/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/Update Check"
             
         - name: Upload WIF.appversion
           uses: actions/upload-artifact@v2
