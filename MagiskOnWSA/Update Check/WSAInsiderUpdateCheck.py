@@ -158,3 +158,9 @@ if not new_version_found:
         os.environ['MSG'] = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
         os.environ['WSA_INSIDER_VER'] = wsa_build_ver
         os.environ['INSIDER_UPDATE'] = 'yes'
+        print("Accessing environment variables...")
+        print("SHOULD_BUILD:", os.environ.get('SHOULD_BUILD'))
+        print("RELEASE_TYPE:", os.environ.get('RELEASE_TYPE'))
+        print("MSG:", os.environ.get('MSG'))
+        print("WSA_INSIDER_VER:", os.environ.get('WSA_INSIDER_VER'))
+        print("INSIDER_UPDATE:", os.environ.get('INSIDER_UPDATE'))
