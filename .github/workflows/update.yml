@@ -87,8 +87,8 @@ jobs:
       SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
       RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
       WSA_UPDATE_MESSAGE: ${{ env.MSG }}
-      LATEST_WIF_VER: ${{ env.WSA_INSIDER_VER }}
-      LATEST_RETAIL_VER: ${{ env.WSA_RETAIL_VER }}
+      LATEST_WIF_VER: ${{ env.LATEST_WIF_VER }}
+      LATEST_RETAIL_VER: ${{ env.LATEST_RETAIL_VER }}
       MAGISK_CANARY_MSG: ${{ env.MAGISK_CANARY_MSG }}
       MAGISK_STABLE_MSG: ${{ env.MAGISK_STABLE_MSG }}
       KERNEL_SU_MSG: ${{ env.KERNEL_SU_MSG }}
