@@ -140,7 +140,7 @@ if not new_version_found:
                 wsa_build_ver = tmp_wsa_build_ver
             elif version.parse(wsa_build_ver) < version.parse(tmp_wsa_build_ver):
                 wsa_build_ver = tmp_wsa_build_ver
-     
+    
     if version.parse(currentver) < version.parse(wsa_build_ver):
         print(f"New version found: {wsa_build_ver}")
         new_version_found = True
@@ -153,14 +153,9 @@ if not new_version_found:
         except Exception as e:
             print(f"Error writing to file: {e}")
         msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
-        os.environ['SHOULD_BUILD'] = 'yes'
-        os.environ['RELEASE_TYPE'] = release_type
-        os.environ['MSG'] = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
-        os.environ['WSA_INSIDER_VER'] = wsa_build_ver
-        os.environ['INSIDER_UPDATE'] = 'yes'
-        print("Accessing environment variables...")
-        print("SHOULD_BUILD:", os.environ.get('SHOULD_BUILD'))
-        print("RELEASE_TYPE:", os.environ.get('RELEASE_TYPE'))
-        print("MSG:", os.environ.get('MSG'))
-        print("WSA_INSIDER_VER:", os.environ.get('WSA_INSIDER_VER'))
-        print("INSIDER_UPDATE:", os.environ.get('INSIDER_UPDATE'))
+        with open(env_file, "a") as wr:
+            wr.write(f"SHOULD_BUILD=yes\n")
+            wr.write(f"RELEASE_TYPE={release_type}\n")
+            wr.write(f"MSG={msg}\n")
+            wr.write(f"RETAIL_UPDATE=yes\n")
+    file.close()
