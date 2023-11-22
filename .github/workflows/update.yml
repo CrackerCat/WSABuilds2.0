@@ -21,6 +21,14 @@ jobs:
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSARetailUpdateCheck.py
            python3 WSARetailUpdateCheck.py
 
+        - name: Check GitHub ENVs
+          run: |
+                echo ${{ env.SHOULD_BUILD }}
+                echo ${{ env.RELEASE_TYPE }}
+                echo ${{ env.MSG }}
+                echo ${{ env.WSA_RETAIL_VER }}
+                echo ${{ env.RETAIL_UPDATE }}
+
         - name: Check Files and Folders
           run: |
            ls
@@ -36,7 +44,7 @@ jobs:
         RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
         WSA_UPDATE_MESSAGE: ${{ env.MSG }}
         LATEST_RETAIL_VER: ${{ env.WSA_RETAIL_VER }}
-        RETAIL_UPDATE: echo ${{ env.RETAIL_UPDATE }}
+        RETAIL_UPDATE: ${{ env.RETAIL_UPDATE }}
       
        
   checkwsainsider:
@@ -56,6 +64,14 @@ jobs:
            wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
            python3 WSAInsiderUpdateCheck.py
 
+        - name: Check GitHub ENVs
+          run: |
+                echo ${{ env.SHOULD_BUILD }}
+                echo ${{ env.RELEASE_TYPE }}
+                echo ${{ env.MSG }}
+                echo ${{ env.WSA_INSIDER_VER }}
+                echo ${{ env.INSIDER_UPDATE }}
+
         - name: Check Files and Folders 1
           run: |
            ls
@@ -71,7 +87,7 @@ jobs:
         RELEASE_TYPE: ${{ env.RELEASE_TYPE }}
         WSA_UPDATE_MESSAGE: ${{ env.MSG }}
         LATEST_WIF_VER: ${{ env.WSA_INSIDER_VER }}
-        INSIDER_UPDATE: echo ${{ env.INSIDER_UPDATE }}
+        INSIDER_UPDATE: ${{ env.INSIDER_UPDATE }}
 
   checkcomponents:
     name: Check updates for components
