@@ -50,7 +50,7 @@ user_code = ""
 users = {""}
 
 print("Current working directory:", os.getcwd())
-print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml'))
+print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml'))
 
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/retail.appversion").text.replace('\n', '')
 
@@ -66,7 +66,7 @@ except Exception as e:
 
 if not new_version_found:
     # Get information
-    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/GetCookie.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml/GetCookie.xml", "r") as f:
         cookie_content = f.read().format(user_code)
     try:
         out = session.post(
@@ -79,7 +79,7 @@ if not new_version_found:
         exit(1)
     doc = minidom.parseString(out.text)
     cookie = doc.getElementsByTagName('EncryptedData')[0].firstChild.nodeValue
-    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/xml/WUIDRequest.xml", "r") as f:
+    with open("/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml/WUIDRequest.xml", "r") as f:
         cat_id_content = f.read().format(user_code, cookie, cat_id, release_type)
     try:
         out = session.post(
