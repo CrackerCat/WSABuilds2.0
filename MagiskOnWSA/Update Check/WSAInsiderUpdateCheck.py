@@ -156,6 +156,7 @@ if not new_version_found:
         with open(env_file, "a") as wr:
             wr.write(f"SHOULD_BUILD=yes\n")
             wr.write(f"RELEASE_TYPE={release_type}\n")
+            wr.write(f"LATEST_WIF_VER={wsa_build_ver}\n")
             wr.write(f"MSG={msg}\n")
-            wr.write(f"RETAIL_UPDATE=yes\n")
+            wr.write(f"INSIDER_UPDATE=yes\n")
     file.close()
