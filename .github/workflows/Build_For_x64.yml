@@ -1,25 +1,26 @@
 name: Auto Build function (Use for call only)
 on:
-  workflow_call:
-    inputs:
-      arch:
-        type: string
-      gapps:
-        type: string
-      root:
-        type: string
-      insider:
-        type: string
-      magiskver:
-        type: string
-      devicemodel:
-        type: string
-      amazonflag:
-        type: string
-      compressformat:
-        type: string
-      release_type:
-        type: string
+  workflow_dispatch:
+#  workflow_call:
+#    inputs:
+#      arch:
+#        type: string
+#      gapps:
+#        type: string
+#      root:
+#        type: string
+#      insider:
+#        type: string
+#      magiskver:
+#        type: string
+#      devicemodel:
+#        type: string
+#      amazonflag:
+#        type: string
+#      compressformat:
+#        type: string
+#      release_type:
+#        type: string
 jobs:
   build:
     name: Build WSA
@@ -28,6 +29,18 @@ jobs:
       - name: Checkout ♻️
         uses: actions/checkout@v4
 
+      - name: Check Folders and Files 1
+        run: |
+            ls 
+
+      - name: Check Folders and Files 2
+        run: |
+            ls MagiskOnWSA
+            
+      - name: Check Folders and Files
+        run: |
+            ls MagiskOnWSA/scripts/
+  
       - name: Setup Python 🏭
         uses: actions/setup-python@v4
         with:
