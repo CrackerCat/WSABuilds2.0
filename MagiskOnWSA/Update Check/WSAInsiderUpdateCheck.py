@@ -153,9 +153,8 @@ if not new_version_found:
         except Exception as e:
             print(f"Error writing to file: {e}")
         msg = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
-        with open(env_file, "a") as wr:
-            wr.write(f"SHOULD_BUILD=yes\n")
-            wr.write(f"RELEASE_TYPE={release_type}\n")
-            wr.write(f"MSG={msg}\n")
-            wr.write(f"WSA_INSIDER_VER={wsa_build_ver}\n")
-            wr.write(f"INSIDER_UPDATE=yes\n")
+        os.environ['SHOULD_BUILD'] = 'yes'
+        os.environ['RELEASE_TYPE'] = release_type
+        os.environ['MSG'] = f'Update WSA Version from `v{currentver}` to `v{wsa_build_ver}`'
+        os.environ['WSA_INSIDER_VER'] = wsa_build_ver
+        os.environ['INSIDER_UPDATE'] = 'yes'
