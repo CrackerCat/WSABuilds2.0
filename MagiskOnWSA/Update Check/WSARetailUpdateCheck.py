@@ -50,7 +50,7 @@ user_code = ""
 users = {""}
 
 print("Current working directory:", os.getcwd())
-print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml'))
+print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal1/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml'))
 
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/retail.appversion").text.replace('\n', '')
 
