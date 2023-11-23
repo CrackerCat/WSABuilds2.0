@@ -10,7 +10,7 @@ currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABui
 git = (
     "git checkout -f update || git switch --discard-changes --orphan update"
 )
-with open('../magiskcanary.appversion', 'w') as file:
+with open('magiskcanary.appversion', 'w') as file:
     file.write(currentver)
 if not new_version_found:
     latestver = ""
