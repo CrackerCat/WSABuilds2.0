@@ -69,7 +69,7 @@ users = {"", user_code}
 currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABuilds2.0/update/WIF.appversion").text.replace('\n', '')
 
 print("Current working directory:", os.getcwd())
-print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal2/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xml'))
+print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal2/xml':", os.listdir('/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal2/xml'))
 
 # Write for pushing later
 try:
