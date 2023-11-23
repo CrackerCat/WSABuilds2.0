@@ -74,7 +74,7 @@ print("Files in '/home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSALocal/xm
 # Write for pushing later
 try:
     # Write for pushing later
-    file = open('../WIF.appversion', 'w')
+    file = open('WIF.appversion', 'w')
     file.write(currentver)
     file.close()
     print("WIF.appversion file created successfully.")
