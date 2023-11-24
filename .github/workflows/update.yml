@@ -16,7 +16,6 @@ jobs:
         run: |
           pip3 install beautifulsoup4 lxml
 
-
       - name: Obtain MagiskOnWSALocal Files ☑️
         run: |
             git clone https://github.com/LSPosed/MagiskOnWSALocal.git MagiskOnWSALocal1
@@ -52,6 +51,9 @@ jobs:
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/MTGUpdateCheck.py
             python3 MTGUpdateCheck.py
+
+      - name: Check Directories and Sub-Directories
+        run: tree
 
       - name: Check GitHub ENVs
         run: |
