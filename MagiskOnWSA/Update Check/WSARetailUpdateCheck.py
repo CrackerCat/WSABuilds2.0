@@ -57,7 +57,7 @@ currentver = requests.get(f"https://raw.githubusercontent.com/MustardChef/WSABui
 # Write for pushing later
 try:
     # Write for pushing later
-    file = open('../retail.appversion', 'w')
+    file = open('retail.appversion', 'w')
     file.write(currentver)
     file.close()
     print("retail.appversion file created successfully.")
