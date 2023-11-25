@@ -16,12 +16,15 @@ jobs:
         run: |
           pip3 install beautifulsoup4 lxml
 
+      - name: Create branch if not found 🏗️
+        run: |
+          git checkout -f update || git switch --discard-changes --orphan update
+
       - name: Obtain MagiskOnWSALocal Files ☑️
         run: |
             git clone https://github.com/LSPosed/MagiskOnWSALocal.git MagiskOnWSALocal1
             git clone https://github.com/LSPosed/MagiskOnWSALocal.git MagiskOnWSALocal2
           
-
       - name: Check WSA Insider Version ✅
         run: |
             wget https://github.com/MustardChef/WSABuilds2.0/raw/master/MagiskOnWSA/Update%20Check/WSAInsiderUpdateCheck.py
