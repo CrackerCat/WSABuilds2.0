@@ -24,6 +24,7 @@ jobs:
   build:
     name: Build WSA
     runs-on: ubuntu-latest
+    working-directory: MagiskOnWSA
     steps:
       - name: Checkout ♻️
         uses: actions/checkout@v4
@@ -56,10 +57,8 @@ jobs:
           packages: e2fsprogs attr unzip qemu-utils python3-venv
           version: 1.0
 
-      - name: Set execute permissions on build.sh
-        run: chmod +x /home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/scripts/build.sh         
-
       - name: Build WSA ${{ inputs.arch }} with GApps ${{ inputs.root }} 🏗️
+        working-directory: MagiskOnWSA/scripts
         id: wsa
         run: |
           if [[ "${{ inputs.release_type }}" == "WIF" ]]; then
@@ -69,7 +68,7 @@ jobs:
           fi
 
           mkdir -p download
-          /home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/scripts/build.sh --arch ${{ inputs.arch }} --release-type $RLS_TYPE ${{ inputs.magiskver }} --gapps-brand ${{ inputs.gapps }} --root-sol ${{ inputs.root }} --custom-model ${{ inputs.devicemodel }} ${{ inputs.amazonflag }} --compress-format ${{ inputs.compressformat }}
+          ./build.sh --arch ${{ inputs.arch }} --release-type $RLS_TYPE ${{ inputs.magiskver }} --gapps-brand ${{ inputs.gapps }} --root-sol ${{ inputs.root }} --custom-model ${{ inputs.devicemodel }} ${{ inputs.amazonflag }} --compress-format ${{ inputs.compressformat }}
 
       - name: Pass to Windows 💸
         uses: actions/upload-artifact@v3
