@@ -56,6 +56,9 @@ jobs:
           packages: e2fsprogs attr unzip qemu-utils python3-venv
           version: 1.0
 
+      - name: Set execute permissions on build.sh
+        run: chmod +x /home/runner/work/WSABuilds2.0/WSABuilds2.0/MagiskOnWSA/scripts/build.sh         
+
       - name: Build WSA ${{ inputs.arch }} with GApps ${{ inputs.root }} 🏗️
         id: wsa
         run: |
