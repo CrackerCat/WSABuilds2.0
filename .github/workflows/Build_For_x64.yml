@@ -24,7 +24,6 @@ jobs:
   build:
     name: Build WSA
     runs-on: ubuntu-latest
-    working-directory: MagiskOnWSA
     steps:
       - name: Checkout ♻️
         uses: actions/checkout@v4
