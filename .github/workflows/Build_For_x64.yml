@@ -60,6 +60,7 @@ jobs:
         working-directory: MagiskOnWSA/scripts
         id: wsa
         run: |
+          chmod +x build.sh
           if [[ "${{ inputs.release_type }}" == "WIF" ]]; then
               RLS_TYPE="latest"
           else
