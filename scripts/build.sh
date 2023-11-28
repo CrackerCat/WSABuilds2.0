@@ -629,14 +629,6 @@ EOF
     echo -e "Add KernelSU Manager done\n"
 fi
 
-echo "Add extra packages"
-sudo cp -r "../$ARCH/system/"* "$SYSTEM_MNT" || abort
-find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -type d -exec chmod 0755 {} \;
-find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -type f -exec chmod 0644 {} \;
-find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -exec chown root:root {} \;
-find "../$ARCH/system/priv-app/" -maxdepth 1 -mindepth 1 -printf '%P\n' | xargs -I placeholder sudo find "$SYSTEM_MNT/priv-app/placeholder" -exec setfattr -n security.selinux -v "u:object_r:system_file:s0" {} \; || abort
-echo -e "Add extra packages done\n"
-
 echo "Permissions management Netfree and Netspark security certificates"
 sudo cp -r "../cacerts/"* "$SYSTEM_MNT/etc/security/cacerts/" || abort
 sudo chmod 0755 "$SYSTEM_MNT/etc/security/cacerts/"
@@ -741,171 +733,34 @@ echo -e "Convert images to vhdx done\n"
 
 echo "Remove signature and add scripts"
 sudo rm -rf "${WORK_DIR:?}"/wsa/"$ARCH"/\[Content_Types\].xml "$WORK_DIR/wsa/$ARCH/AppxBlockMap.xml" "$WORK_DIR/wsa/$ARCH/AppxSignature.p7x" "$WORK_DIR/wsa/$ARCH/AppxMetadata" || abort
+if [ "$ARCH" = "x64" ]; then
+    sudo rm -rf "$WORK_DIR/wsa/$ARCH/arm64/" || abort
+else
+    sudo rm -rf "$WORK_DIR/wsa/$ARCH/amd64/" || abort
+fi
 mkdir "$WORK_DIR/wsa/$ARCH/uwp"
 cp "$VCLibs_PATH" "$xaml_PATH" "$WORK_DIR/wsa/$ARCH/uwp/" || abort
 cp "$UWPVCLibs_PATH" "$xaml_PATH" "$WORK_DIR/wsa/$ARCH/uwp/" || abort
 cp "../xml/priconfig.xml" "$WORK_DIR/wsa/$ARCH/xml/" || abort
-if [[ "$ROOT_SOL" == "none" ]]; then 
-    rootInfo=""
-    if [ "$GAPPS_BRAND" = "none" ]; then
-        gappsInfo="-NoGApps"
-    else
-        gappsInfo=-MindTheGapps-13.0
-    fi   
-    buildName=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${rootInfo}${gappsInfo}
-    if [ "$REMOVE_AMAZON" = "yes" ]; then
-        buildName+="-RemovedAmazon"
-    fi    
-    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $buildName" ../installer/$ARCH/Install.ps1 
-elif [ "$ROOT_SOL" == "magisk" ]; then
-    rootInfo="-with-magisk-$MAGISK_VERSION_NAME($MAGISK_VERSION_CODE)-$MAGISK_VER"
-    if [ "$GAPPS_BRAND" = "none" ]; then
-        gappsInfo="-NoGApps"
-    else
-        gappsInfo=-MindTheGapps-13.0
-    fi   
-    buildName=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${rootInfo}${gappsInfo}
-    if [ "$REMOVE_AMAZON" = "yes" ]; then
-        buildName+="-RemovedAmazon"
-    fi    
-    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $buildName" ../installer/$ARCH/Install.ps1 
-elif [ "$ROOT_SOL" == "kernelsu" ]; then  
-    rootInfo="-with-kernelsu-$KERNELSU_VER"
-    if [ "$GAPPS_BRAND" = "none" ]; then
-        gappsInfo="-NoGApps"
-    else
-        gappsInfo=-MindTheGapps-13.0
-    fi   
-    buildName=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${rootInfo}${gappsInfo}
-    if [ "$REMOVE_AMAZON" = "yes" ]; then
-        buildName+="-RemovedAmazon"
-    fi    
-    sudo sed -i "/Start-Process \"wsa:\/\/com.android.settings\"/a\ \ \ \ # $buildName" ../installer/$ARCH/Install.ps1 
-fi
 if [[ "$ROOT_SOL" = "none" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then
-    sudo sed -i -e 's@Start-Process\ "wsa://com.topjohnwu.magisk"@@g' ../installer/$ARCH/Install.ps1
-    sudo sed -i -e 's@Start-Process\ "wsa://com.android.vending"@@g' ../installer/$ARCH/Install.ps1
-    readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/No%20Root/No%20Gapps%20and%20Removed%20AMZ/No%20Gapps%20and%20Removed%20Amazon.md"
-    sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1 
-elif [[ "$ROOT_SOL" = "none" ]] && [[ "$GAPPS_BRAND" = "MindTheGapps" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then 
-    readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/No%20Root/MindTheGapps%20and%20Removed%20AMZ/MindTheGapps%20and%20Removed%20Amazon.md"
-    sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1 
-elif [[ "$ROOT_SOL" = "none" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" != "yes" ]]; then 
-    readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/No%20Root/No%20Gapps%20and%20AMZ/No%20Gapps%20and%20Amazon%20Appstore.md"
-    sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1 
-elif [[ "$ROOT_SOL" = "none" ]] && [[ "$GAPPS_BRAND" = "MindTheGapps" ]] && [[ "$REMOVE_AMAZON" != "yes" ]]; then 
-    readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/No%20Root/MindTheGapps%20and%20AMZ/MindTheGapps%20and%20Amazon%20Appstore.md"
-    sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1 
-elif [[ "$ROOT_SOL" = "kernelsu" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then
-    sudo sed -i -e 's@wsa://com.topjohnwu.magisk@https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/KernelSU/No%20Gapps%20and%20Removed%20AMZ/No%20Gapps%20and%20Removed%20AMZ.md@g' ../installer/$ARCH/Install.ps1
-elif [[ "$ROOT_SOL" = "kernelsu" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" != "yes" ]]; then
-    sudo sed -i -e 's@wsa://com.topjohnwu.magisk@https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/KernelSU/No%20Gapps%20and%20AMZ/No%20Gapps%20and%20AMZ.md@g' ../installer/$ARCH/Install.ps1
-elif [[ "$ROOT_SOL" = "kernelsu" ]] && [[ "$GAPPS_BRAND" = "MindTheGapps" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then
-    sudo sed -i -e 's@wsa://com.topjohnwu.magisk@https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/KernelSU/MindTheGapps%20and%20Removed%20AMZ/MindTheGapps%20and%20Removed%20AMZ.md@g' ../installer/$ARCH/Install.ps1
-elif [[ "$ROOT_SOL" = "kernelsu" ]] && [[ "$GAPPS_BRAND" = "MindTheGapps" ]] && [[ "$REMOVE_AMAZON" != "yes" ]]; then
-    sudo sed -i -e 's@wsa://com.topjohnwu.magisk@https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/KernelSU/MindTheGapps%20and%20AMZ/MindTheGapps%20and%20AMZ.md@g' ../installer/$ARCH/Install.ps1            
+    sed -i -e 's@Start-Process\ "wsa://com.topjohnwu.magisk"@@g' "../installer/$ARCH/Install.ps1"
+    sed -i -e 's@Start-Process\ "wsa://com.android.vending"@@g' "../installer/$ARCH/Install.ps1"
 else
     if [[ "$ROOT_SOL" == "none" ]]; then
-        sed -i -e 's@Start-Process "wsa://com.topjohnwu.magisk"@@g' ../installer/$ARCH/Install.ps1
+        sed -i -e 's@Start-Process "wsa://com.topjohnwu.magisk"@@g' "../installer/$ARCH/Install.ps1"
+    elif [[ "$ROOT_SOL" = "kernelsu" ]]; then
+        sed -i -e 's@wsa://com.topjohnwu.magisk@https://github.com/YT-Advanced/WSA-Script/blob/HEAD/docs/Guides/KernelSU.md@g' "../installer/$ARCH/Install.ps1"
     elif [[ "$MAGISK_VER" = "delta" ]]; then
-        sed -i -e 's@com.topjohnwu.magisk@io.github.huskydg.magisk@g' ../installer/$ARCH/Install.ps1
+        sed -i -e 's@com.topjohnwu.magisk@io.github.huskydg.magisk@g' "../installer/$ARCH/Install.ps1"
     elif [[ "$MAGISK_VER" = "alpha" ]]; then
-        sed -i -e 's@com.topjohnwu.magisk@io.github.vvb2060.magisk@g' ../installer/$ARCH/Install.ps1
+        sed -i -e 's@com.topjohnwu.magisk@io.github.vvb2060.magisk@g' "../installer/$ARCH/Install.ps1"
     fi
     if [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" != "yes" ]]; then
-        sed -i -e 's@com.android.vending@com.amazon.venezia@g' ../installer/$ARCH/Install.ps1
+        sed -i -e 's@com.android.vending@com.amazon.venezia@g' "../installer/$ARCH/Install.ps1"
     elif [[ "$GAPPS_BRAND" = "none" ]]; then
-        sed -i -e 's@Start-Process\ "wsa://com.android.vending"@@g' ../installer/$ARCH/Install.ps1
+        sed -i -e 's@Start-Process\ "wsa://com.android.vending"@@g' "../installer/$ARCH/Install.ps1"
     fi
-    if [[ "$ROOT_SOL" = "magisk" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then
-        if [ "$MAGISK_VER" = "canary" ]; then
-            # Open GitHub readme page for Magisk Canary and NoGappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20Removed%20AMZ/Canary.md"
-        elif [ "$MAGISK_VER" = "stable" ]; then
-            # Open GitHub readme page for Magisk Stable and NoGappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20Removed%20AMZ/Stable.md"
-        elif [ "$MAGISK_VER" = "beta" ]; then
-            # Open GitHub readme page for Magisk Beta and NoGappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20Removed%20AMZ/Beta.md"
-        elif [ "$MAGISK_VER" = "debug" ]; then
-            # Open GitHub readme page for Magisk Debug and NoGappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20Removed%20AMZ/Debug.md"
-        elif [ "$MAGISK_VER" = "alpha" ]; then
-            # Open GitHub readme page for Magisk Alpha and NoGappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20Removed%20AMZ/Alpha.md"
-        elif [ "$MAGISK_VER" = "delta" ]; then
-            # Open GitHub readme page for Magisk Delta and NoGappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20Removed%20AMZ/Delta.md"
-        fi
-        sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1
-    fi 
-    if [[ "$ROOT_SOL" = "magisk" ]] && [[ "$GAPPS_BRAND" = "none" ]] && [[ "$REMOVE_AMAZON" != "yes" ]]; then
-        if [ "$MAGISK_VER" = "canary" ]; then
-            # Open GitHub readme page for Magisk Canary and NoGappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20AMZ/Canary.md"
-        elif [ "$MAGISK_VER" = "stable" ]; then
-            # Open GitHub readme page for Magisk Stable and NoGappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20AMZ/Stable.md"
-        elif [ "$MAGISK_VER" = "beta" ]; then
-            # Open GitHub readme page for Magisk Beta and NoGappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20AMZ/Beta.md"
-        elif [ "$MAGISK_VER" = "debug" ]; then
-            # Open GitHub readme page for Magisk Debug and NoGappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20AMZ/Debug.md"
-        elif [ "$MAGISK_VER" = "alpha" ]; then
-            # Open GitHub readme page for Magisk Alpha and NoGappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20AMZ/Alpha.md"
-        elif [ "$MAGISK_VER" = "delta" ]; then
-            # Open GitHub readme page for Magisk Delta and NoGappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/No%20Gapps%20and%20AMZ/Delta.md"
-        fi
-        sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1
-    fi
-    if [[ "$ROOT_SOL" = "magisk" ]] && [[ "$GAPPS_BRAND" = "MindTheGapps" ]] && [[ "$REMOVE_AMAZON" == "yes" ]]; then
-        if [ "$MAGISK_VER" = "canary" ]; then
-            # Open GitHub readme page for Magisk Canary and GappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20Removed%20AMZ/Canary.md"
-        elif [ "$MAGISK_VER" = "stable" ]; then
-            # Open GitHub readme page for Magisk Stable and GappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20Removed%20AMZ/Stable.md"
-        elif [ "$MAGISK_VER" = "beta" ]; then
-            # Open GitHub readme page for Magisk Beta and GappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20Removed%20AMZ/Beta.md"
-        elif [ "$MAGISK_VER" = "debug" ]; then
-            # Open GitHub readme page for Magisk Debug and GappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20Removed%20AMZ/Debug.md"
-        elif [ "$MAGISK_VER" = "alpha" ]; then
-            # Open GitHub readme page for Magisk Alpha and GappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20Removed%20AMZ/Alpha.md"
-        elif [ "$MAGISK_VER" = "delta" ]; then
-            # Open GitHub readme page for Magisk Delta and GappsNoAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20Removed%20AMZ/Delta.md"
-        fi
-        sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1
-    fi 
-    if [[ "$ROOT_SOL" = "magisk" ]] && [[ "$GAPPS_BRAND" = "MindTheGapps" ]] && [[ "$REMOVE_AMAZON" != "yes" ]]; then
-        if [ "$MAGISK_VER" = "canary" ]; then
-            # Open GitHub readme page for Magisk Canary and GappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20AMZ/Canary.md"
-        elif [ "$MAGISK_VER" = "stable" ]; then
-            # Open GitHub readme page for Magisk Stable and GappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20AMZ/Stable.md"
-        elif [ "$MAGISK_VER" = "beta" ]; then
-            # Open GitHub readme page for Magisk Beta and GappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20AMZ/Beta.md"
-        elif [ "$MAGISK_VER" = "debug" ]; then
-            # Open GitHub readme page for Magisk Debug and GappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20AMZ/Debug.md"
-        elif [ "$MAGISK_VER" = "alpha" ]; then
-            # Open GitHub readme page for Magisk Alpha and GappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20AMZ/Alpha.md"
-        elif [ "$MAGISK_VER" = "delta" ]; then
-            # Open GitHub readme page for Magisk Delta and GappsAMZ
-            readmeUrl="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/Usage%20Guides/Post-Installation%20Guides/Magisk/MindTheGapps%20and%20AMZ/Delta.md"
-        fi  
-        sudo sed -i "/Start-Process \"shell:AppsFolder\\\\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe!SettingsApp\"/a\ \ \ \ Start-Process \"$readmeUrl\"" ../installer/$ARCH/Install.ps1
-    fi   
-fi  
+fi
 cp "../installer/$ARCH/Install.ps1" "$WORK_DIR/wsa/$ARCH" || abort
 find "$WORK_DIR/wsa/$ARCH" -not -path "*/uwp*" -not -path "*/pri*" -not -path "*/xml*" -printf "%P\n" | sed -e 's@/@\\@g' -e '/^$/d' > "$WORK_DIR/wsa/$ARCH/filelist.txt" || abort
 find "$WORK_DIR/wsa/$ARCH/pri" -printf "%P\n" | sed -e 's/^/pri\\/' -e '/^$/d' > "$WORK_DIR/wsa/$ARCH/filelist-pri.txt" || abort
@@ -918,7 +773,7 @@ echo "Generate info"
 if [[ "$ROOT_SOL" = "none" ]]; then
     name1=""
 elif [ "$ROOT_SOL" = "magisk" ]; then
-    name1="-with-magisk-$MAGISK_VERSION_NAME($MAGISK_VERSION_CODE)-$MAGISK_VER"
+    name1="-with-Magisk-$MAGISK_VERSION_NAME-$MAGISK_VER"
 elif [ "$ROOT_SOL" = "kernelsu" ]; then
     name1="-with-KernelSU-$KERNELSU_VER"
 fi
@@ -930,19 +785,18 @@ fi
 if [[ "$MODEL_NAME" != "default" ]]; then
     name3="-as-$MODEL_NAME"
 fi
-artifact_name=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${name1}${name2}
-short_artifact_name=WSA_${WSA_VER}_${ARCH}
+artifact_name=WSA_${WSA_VER}_${ARCH}_${WSA_REL}${name1}${name2}${name3}
 if [ "$REMOVE_AMAZON" = "yes" ]; then
     artifact_name+="-RemovedAmazon"
     touch "$WORK_DIR/wsa/$ARCH/apex/.gitkeep"
 fi
-echo "$short_artifact_name"
+echo "$artifact_name"
 echo -e "\nFinishing building...."
 mkdir -p "$OUTPUT_DIR"
 OUTPUT_PATH="${OUTPUT_DIR:?}/$artifact_name"
-mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$short_artifact_name"
+mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$artifact_name"
 {
-  echo "artifact=${short_artifact_name}"
+  echo "artifact=${artifact_name}"
   echo "arch=${ARCH}"
   echo "file_ext=.${COMPRESS_FORMAT}"
   echo "built=$(date -u +%Y%m%d%H%M%S)"
@@ -950,9 +804,9 @@ mv "$WORK_DIR/wsa/$ARCH" "$WORK_DIR/wsa/$short_artifact_name"
 if [[ "$COMPRESS_FORMAT" = "7z" && -z $AFTER_COMPRESS ]]; then
     echo "Compressing with 7-Zip"
     OUTPUT_PATH="$OUTPUT_PATH.7z"
-    7z a -mx=7 "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$short_artifact_name" || abort
+    7z a -mx=7 "${OUTPUT_PATH:?}" "$WORK_DIR/wsa/$artifact_name" || abort
 else
     echo "Compressing with ZIP later..."
-    cp -r "$WORK_DIR/wsa/$short_artifact_name" "$OUTPUT_PATH" || abort
+    cp -r "$WORK_DIR/wsa/$artifact_name" "$OUTPUT_PATH" || abort
 fi
 echo -e "Done\n"
